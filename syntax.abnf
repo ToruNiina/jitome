@@ -1,0 +1,75 @@
+; ABNF
+
+ident = (alpha / underscore) *(alpha / underscore / digit)
+
+negligible = whitespace / comment ; ws, tab, or /* ... */
+
+expression = (arithmetic / function-call / primary)
+expression =/ paren-open [ negligible ] (arithmetic / function-call / primary) [ negligible ] paren-close ; (x + y)
+
+arithmetic  = addition / subtraction / multiplication / division / negation
+addition    = expression [ negligible ] operator-addition    [ negligible ] expression
+subtraction = expression [ negligible ] operator-subtraction [ negligible ] expression
+multiply    = expression [ negligible ] operator-multiply    [ negligible ] expression
+division    = expression [ negligible ] operator-division    [ negligible ] expression
+negation    = operator-subtraction expression
+power       = expression [ negligible ] operator-power [ negligible ] immediate-integer
+
+function-call      = ident [ negligible ] paren-open [ negligible ] function-arguments [ negligible ] paren-close
+function-arguments = function-argument *( [ negligible ] comma [ negligible ] function-argument )
+function-argument  = expression / primary
+
+primary = immediate / ident
+
+immediate = immediate-real
+immediate-real = [ immediate-sign ] immediate-real-integer-part [ immediate-real-fractional-part ] [ immeidate-real-exponent-part ] 
+immediate-real =/ immediate-special-inf
+immediate-real =/ immediate-special-nan
+immediate-real-integer-part    =  non-zero-digit *digit
+immediate-real-integer-part    =/ zero
+immediate-real-fractional-part = %x2E 1*digit
+immediate-real-exponent-part   = ( %x65 / %x45 ) 1*digit
+immediate-special-inf = %x69.6e.66
+immediate-special-nan = %x6e.61.6e
+immediate-sign = %x2B / %x2D
+
+immediate-integer = [ immediate-sign ] non-zero-digit *digit
+
+operator-multiply    = %x2A ; *
+operator-addition    = %x2B ; +
+operator-subtraction = %x2D ; -
+operator-division    = %x2F ; /
+operator-power       = %x5E ; ^
+
+paren-open  = %x28 ; (
+paren-close = %x29 ; )
+
+; /* comment */
+comment = comment-start-symbol *comment-content-characters comment-stop-symbol ; /* ... */
+comment-start-symbol            = %x2F %x2A ; /*
+comment-content-characters      = tab / newline / non-control-characters
+comment-stop-symbol             = %x2A %x2F ; */
+
+; // comment
+comment-line = comment-line-start-symbol *comment-line-content-characters newline   ; // ... LF
+comment-line-start-symbol       = %x2F %x2F ; //
+comment-line-content-characters = tab / non-control-characters
+
+; elements
+non-control-characters = %x20-7E
+newline = linefeed / carriage-return linefeed
+linefeed =  %0A
+carriage-return = %09
+
+whitespace = *whitespace-characters
+whitespace-characters =  %x20 ; space
+whitespace-characters =/ %x09 ; tab
+
+alpha = ALPHA ; core rules
+digit = DIGIT
+underscore = %x5F ; _
+comma = %x2C
+non-zero-digit = %x31-39
+zero  = %x30
+space = %x20
+tab   = %x09
