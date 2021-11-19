@@ -9,7 +9,7 @@ template<typename T>
 using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
 
 template<typename T, typename U>
-constexpr inline bool is_typeof = std::is_same_v<std::remove_cvref_t<T>, U>;
+constexpr inline bool is_typeof = std::is_same_v<remove_cvref_t<T>, U>;
 
 } // jitome
 #endif// JITOME_TRAITS_HPP
