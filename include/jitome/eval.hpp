@@ -3,6 +3,8 @@
 #include "traits.hpp"
 #include "ast.hpp"
 
+#include <limits>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -15,7 +17,7 @@ template<typename F, std::size_t N, std::size_t ... Is>
 double invoke_func_impl(std::map<std::string, double>& env,
         const NodeExpression<F, N>& node, std::index_sequence<Is...>)
 {
-    return F::invoke(evaluate(env, std::get<Is>(node.operands)), ...);
+    return F::invoke(evaluate(env, *std::get<Is>(node.operands))...);
 }
 
 template<typename F, std::size_t N>
@@ -31,7 +33,7 @@ double evaluate(std::map<std::string, double>& env, const Node& root)
         {
             return env.at(node.name);
         }
-        else if constexpr (is_typeof<decltype(node), NodeImmedaite>)
+        else if constexpr (is_typeof<decltype(node), NodeImmediate>)
         {
             return node.value;
         }
@@ -43,7 +45,7 @@ double evaluate(std::map<std::string, double>& env, const Node& root)
         {
             return std::numeric_limits<double>::quiet_NaN();
         }
-    }, root);
+    }, root.node);
 }
 
 } // jitome
