@@ -17,21 +17,19 @@ struct NodeImmediate
 {
     double value;
 };
+
 template<typename Func, std::size_t N>
 struct NodeExpression
 {
     using func_type = Func;
+    inline constexpr std::size_t size = N;
     std::array<std::unique_ptr<Node>, N> operands;
 };
-template<typename T> struct is_unary_expr  : std::false_type {};
-template<typename T> struct is_binary_expr : std::false_type {};
-template<typename T> struct is_triary_expr : std::false_type {};
-template<typename F> struct is_unary_expr<NodeExpression<F, 1>>   : std::true_type {};
-template<typename F> struct is_binary_expr<NodeExpression<F, 2>>  : std::true_type {};
-template<typename F> struct is_trinary_expr<NodeExpression<F, 3>> : std::true_type {};
-
+template<typename T> struct is_expr_node : std::false_type {};
 template<typename F, std::size_t N>
-using func_type_of = typename NodeExpression<F, N>::func_type;
+struct is_expr_node<NodeExpression<F, N>> : std::true_type {};
+template<typename T>
+constexpr inline bool is_expr_node_v = is_expr_node<remove_cvref_t<T>>::value;
 
 struct addition
 {
