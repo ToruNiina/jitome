@@ -9,6 +9,21 @@
 namespace jitome
 {
 
+double evaluate(std::map<std::string, double>& env, const Node& root);
+
+template<typename F, std::size_t N, std::size_t ... Is>
+double invoke_func_impl(std::map<std::string, double>& env,
+        const NodeExpression<F, N>& node, std::index_sequence<Is...>)
+{
+    return F::invoke(evaluate(env, std::get<Is>(node.operands)), ...);
+}
+
+template<typename F, std::size_t N>
+double invoke_func(std::map<std::string, double>& env, const NodeExpression<F, N>& node)
+{
+    return invoke_func_impl(env, node, std::make_index_sequence<N>{});
+}
+
 double evaluate(std::map<std::string, double>& env, const Node& root)
 {
     return std::visit([&env] (const auto& node) {
@@ -20,26 +35,9 @@ double evaluate(std::map<std::string, double>& env, const Node& root)
         {
             return node.value;
         }
-        else if constexpr (is_expr<decltype(node), 1>)
+        else if constexpr (is_expr_node_v<decltype(node)>)
         {
-            return func_type_of<decltype(node)>::invoke(
-                    evaluate(node.operands[0])
-                );
-        }
-        else if constexpr (is_expr<decltype(node), 2>)
-        {
-            return func_type_of<decltype(node)>::invoke(
-                    evaluate(node.operands[0]),
-                    evaluate(node.operands[1])
-                );
-        }
-        else if constexpr (is_expr<decltype(node), 3>)
-        {
-            return func_type_of<decltype(node)>::invoke(
-                    evaluate(node.operands[0]),
-                    evaluate(node.operands[1]),
-                    evaluate(node.operands[2])
-                );
+            return invoke_func(env, node);
         }
         else
         {
