@@ -67,7 +67,11 @@ struct Node
         > node;
 };
 
-
+template<typename T>
+std::unique_ptr<Node> make_node_ptr(T&& n)
+{
+    return std::make_unique<Node>(Node{std::forward<T>(n)});
+}
 
 } // jitome
 #endif// JITOME_AST_HPP
