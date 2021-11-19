@@ -32,37 +32,39 @@ struct is_expr_node<NodeExpression<F, N>> : std::true_type {};
 template<typename T>
 constexpr inline bool is_expr_node_v = is_expr_node<remove_cvref_t<T>>::value;
 
-struct addition
-{
-    static inline double invoke(double x, double y) noexcept {return x + y;}
-};
-struct subtraction
-{
-    static inline double invoke(double x, double y) noexcept {return x - y;}
-};
-struct multiplication
-{
-    static inline double invoke(double x, double y) noexcept {return x * y;}
-};
-struct division
-{
-    static inline double invoke(double x, double y) noexcept {return x / y;}
-};
-struct negation
-{
-    static inline double invoke(double x) noexcept {return -x;}
-};
+#define JITOME_DEFINE_BINARY_OPERATION_FUNCTION(name, expr)      \
+    struct name                                                  \
+    {                                                            \
+        static inline double invoke(double x, double y) noexcept \
+        {return (expr);}                                         \
+    }
+
+JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Addition,       (x+y));
+JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Subtraction,    (x-y));
+JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Multiplication, (x*y));
+JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Division,       (x/y));
+#undef JITOME_DEFINE_BINARY_OPERATION_FUNCTION
+
+#define JITOME_DEFINE_UNARY_OPERATION_FUNCTION(name, expr) \
+    struct name                                            \
+    {                                                      \
+        static inline double invoke(double x) noexcept     \
+        {return (expr);}                                   \
+    }
+
+JITOME_DEFINE_UNARY_OPERATION_FUNCTION(Negation, (-x));
+#undef JITOME_DEFINE_UNARY_OPERATION_FUNCTION
 
 struct Node
 {
     std::variant<
         NodeVariable,
         NodeImmediate,
-        NodeExpression<addition,       2>,
-        NodeExpression<subtraction,    2>,
-        NodeExpression<multiplication, 2>,
-        NodeExpression<division,       2>,
-        NodeExpression<negation,       1>
+        NodeExpression<Addition,       2>,
+        NodeExpression<Subtraction,    2>,
+        NodeExpression<Multiplication, 2>,
+        NodeExpression<Division,       2>,
+        NodeExpression<Negation,       1>
         > node;
 };
 
