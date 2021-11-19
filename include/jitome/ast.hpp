@@ -1,5 +1,6 @@
 #ifndef JITOME_AST_HPP
 #define JITOME_AST_HPP
+#include "traits.hpp"
 #include <memory>
 #include <string>
 #include <variant>
@@ -22,7 +23,7 @@ template<typename Func, std::size_t N>
 struct NodeExpression
 {
     using func_type = Func;
-    inline constexpr std::size_t size = N;
+    static constexpr inline std::size_t size = N;
     std::array<std::unique_ptr<Node>, N> operands;
 };
 template<typename T> struct is_expr_node : std::false_type {};
@@ -55,13 +56,13 @@ struct negation
 struct Node
 {
     std::variant<
-        node_variable,
-        node_immediate,
-        node_expression<addition,       2>,
-        node_expression<subtraction,    2>,
-        node_expression<multiplication, 2>,
-        node_expression<division,       2>,
-        node_expression<negation,       1>
+        NodeVariable,
+        NodeImmediate,
+        NodeExpression<addition,       2>,
+        NodeExpression<subtraction,    2>,
+        NodeExpression<multiplication, 2>,
+        NodeExpression<division,       2>,
+        NodeExpression<negation,       1>
         > node;
 };
 
