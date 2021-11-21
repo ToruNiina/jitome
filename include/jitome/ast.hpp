@@ -10,7 +10,7 @@ namespace jitome
 
 struct Node;
 
-struct NodeVariable
+struct NodeArgument
 {
     std::string name;
 };
@@ -58,7 +58,7 @@ JITOME_DEFINE_UNARY_OPERATION_FUNCTION(Negation, (-x));
 struct Node
 {
     std::variant<
-        NodeVariable,
+        NodeArgument,
         NodeImmediate,
         NodeExpression<Addition,       2>,
         NodeExpression<Subtraction,    2>,
