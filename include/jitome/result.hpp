@@ -136,7 +136,7 @@ result<remove_cvref_t<T>> ok(T&& val)
 {
     return result<remove_cvref_t<T>>(std::forward<T>(val));
 }
-result<void> ok()
+inline result<void> ok()
 {
     return result<void>{};
 }
@@ -145,6 +145,28 @@ result<T> err(std::string msg)
 {
     return result<T>(typename result<T>::error_type{std::move(msg)});
 }
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const result<T>& res)
+{
+    if(res.is_val())
+    {
+        if constexpr(std::is_same_v<T, void>)
+        {
+            os << "OK()";
+        }
+        else
+        {
+            os << "OK(" << res.as_val() << ")";
+        }
+    }
+    else
+    {
+        os << "ERR(" << res.as_err() << ")";
+    }
+    return os;
+}
+
 
 } // jitome
 #endif// JITOME_RESULT_HPP
