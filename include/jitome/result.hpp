@@ -79,6 +79,7 @@ struct Result
     Result& operator=(Result&&)      = default;
     ~Result() = default;
 
+    bool is_ok () const noexcept {return storage_.index() == 0;}
     bool is_val() const noexcept {return storage_.index() == 0;}
     bool is_err() const noexcept {return storage_.index() == 1;}
 
@@ -119,6 +120,7 @@ struct Result<void>
     Result& operator=(Result&&)      = default;
     ~Result() = default;
 
+    bool is_ok () const noexcept {return !storage_.has_value();}
     bool is_val() const noexcept {return !storage_.has_value();}
     bool is_err() const noexcept {return  storage_.has_value();}
 
@@ -149,7 +151,7 @@ Result<T> err(std::string msg)
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const Result<T>& res)
 {
-    if(res.is_val())
+    if(res.is_ok ())
     {
         if constexpr(std::is_same_v<T, void>)
         {
