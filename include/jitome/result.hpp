@@ -9,7 +9,7 @@ namespace jitome
 {
 
 template<typename T>
-struct result
+struct Result
 {
     using value_type = T;
 
@@ -18,22 +18,22 @@ struct result
         std::string msg;
     };
 
-    result(error_type err): storage_(std::move(err)) {}
-    result(value_type val): storage_(std::move(val)) {}
+    Result(error_type err): storage_(std::move(err)) {}
+    Result(value_type val): storage_(std::move(val)) {}
 
-    result& operator=(error_type err)
+    Result& operator=(error_type err)
     {
         this->storage_ = std::move(err);
         return *this;
     }
-    result& operator=(value_type val)
+    Result& operator=(value_type val)
     {
         this->storage_ = std::move(val);
         return *this;
     }
 
     template<typename U>
-    result(const result<U>& other)
+    Result(const Result<U>& other)
     {
         if(other.is_err())
         {
@@ -53,7 +53,7 @@ struct result
     }
 
     template<typename U>
-    result& operator=(const result<U>& other)
+    Result& operator=(const Result<U>& other)
     {
         if(other.is_err())
         {
@@ -73,11 +73,11 @@ struct result
         return *this;
     }
 
-    result(const result&)            = default;
-    result(result&&)                 = default;
-    result& operator=(const result&) = default;
-    result& operator=(result&&)      = default;
-    ~result() = default;
+    Result(const Result&)            = default;
+    Result(Result&&)                 = default;
+    Result& operator=(const Result&) = default;
+    Result& operator=(Result&&)      = default;
+    ~Result() = default;
 
     bool is_val() const noexcept {return storage_.index() == 0;}
     bool is_err() const noexcept {return storage_.index() == 1;}
@@ -95,7 +95,7 @@ struct result
 };
 
 template<>
-struct result<void>
+struct Result<void>
 {
     using value_type = void;
 
@@ -104,20 +104,20 @@ struct result<void>
         std::string msg;
     };
 
-    result(error_type err): storage_(std::move(err)) {}
-    result(): storage_(std::nullopt) {}
+    Result(error_type err): storage_(std::move(err)) {}
+    Result(): storage_(std::nullopt) {}
 
-    result& operator=(error_type err)
+    Result& operator=(error_type err)
     {
         this->storage_ = std::move(err);
         return *this;
     }
 
-    result(const result&)            = default;
-    result(result&&)                 = default;
-    result& operator=(const result&) = default;
-    result& operator=(result&&)      = default;
-    ~result() = default;
+    Result(const Result&)            = default;
+    Result(Result&&)                 = default;
+    Result& operator=(const Result&) = default;
+    Result& operator=(Result&&)      = default;
+    ~Result() = default;
 
     bool is_val() const noexcept {return !storage_.has_value();}
     bool is_err() const noexcept {return  storage_.has_value();}
@@ -132,22 +132,22 @@ struct result<void>
 };
 
 template<typename T>
-result<remove_cvref_t<T>> ok(T&& val)
+Result<remove_cvref_t<T>> ok(T&& val)
 {
-    return result<remove_cvref_t<T>>(std::forward<T>(val));
+    return Result<remove_cvref_t<T>>(std::forward<T>(val));
 }
-inline result<void> ok()
+inline Result<void> ok()
 {
-    return result<void>{};
+    return Result<void>{};
 }
 template<typename T = void>
-result<T> err(std::string msg)
+Result<T> err(std::string msg)
 {
-    return result<T>(typename result<T>::error_type{std::move(msg)});
+    return Result<T>(typename Result<T>::error_type{std::move(msg)});
 }
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const result<T>& res)
+std::ostream& operator<<(std::ostream& os, const Result<T>& res)
 {
     if(res.is_val())
     {
