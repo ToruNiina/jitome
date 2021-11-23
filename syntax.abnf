@@ -1,6 +1,6 @@
 ; ABNF
 
-ident = (alpha / underscore) *(alpha / underscore / digit)
+ident = alpha *(alpha / underscore / digit)
 
 negligible = whitespace / comment ; ws, tab, or /* ... */
 
