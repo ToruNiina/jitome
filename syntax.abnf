@@ -5,18 +5,18 @@ ident = (alpha / underscore) *(alpha / underscore / digit)
 negligible = whitespace / comment ; ws, tab, or /* ... */
 
 expression = (arithmetic / function-call / primary)
-expression =/ paren-open [ negligible ] (arithmetic / function-call / primary) [ negligible ] paren-close ; (x + y)
+expression =/ paren-open *negligible (arithmetic / function-call / primary) *negligible paren-close ; (x + y)
 
 arithmetic  = addition / subtraction / multiplication / division / negation
-addition    = expression [ negligible ] operator-addition    [ negligible ] expression
-subtraction = expression [ negligible ] operator-subtraction [ negligible ] expression
-multiply    = expression [ negligible ] operator-multiply    [ negligible ] expression
-division    = expression [ negligible ] operator-division    [ negligible ] expression
+addition    = expression *negligible operator-addition    *negligible expression
+subtraction = expression *negligible operator-subtraction *negligible expression
+multiply    = expression *negligible operator-multiply    *negligible expression
+division    = expression *negligible operator-division    *negligible expression
 negation    = operator-subtraction expression
-power       = expression [ negligible ] operator-power [ negligible ] immediate-integer
+power       = expression *negligible operator-power negligible immediate-integer
 
-function-call      = ident [ negligible ] paren-open [ negligible ] function-arguments [ negligible ] paren-close
-function-arguments = function-argument *( [ negligible ] comma [ negligible ] function-argument )
+function-call      = ident *negligible paren-open *negligible function-arguments *negligible paren-close
+function-arguments = function-argument *( *negligible comma *negligible function-argument )
 function-argument  = expression / primary
 
 primary = immediate / ident
