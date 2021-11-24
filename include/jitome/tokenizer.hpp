@@ -40,12 +40,6 @@ Token make_token(TokenKind k, std::shared_ptr<std::string> src, Iter first, Iter
     return Token{k, whole.substr(begin, len), len, std::move(src)};
 }
 
-template<typename Iter>
-bool is_twochar(Iter iter, Iter end, const char c1, const char c2)
-{
-    return (iter != end && *iter == c1 &&
-            std::next(iter) != end && *std::next(iter) == c2);
-}
 template<typename Iter, std::size_t N>
 bool is_chars(Iter iter, Iter end, const char (&cs)[N])
 {
@@ -60,7 +54,7 @@ bool is_chars(Iter iter, Iter end, const char (&cs)[N])
 template<typename Iter>
 bool is_newline(Iter iter, Iter end)
 {
-    return (iter != end && *iter == '\n') || is_twochar(iter, end, '\r', '\n');
+    return (iter != end && *iter == '\n') || is_chars(iter, end, "\r\n");
 }
 
 template<typename Iter>
@@ -70,7 +64,7 @@ Iter skip_newline(Iter iter, Iter end)
     {
         iter = std::next(iter, 1);
     }
-    else if(is_twochar(iter, end, '\r', '\n'))
+    else if(is_chars(iter, end, "\r\n"))
     {
         iter = std::next(iter, 2);
     }
@@ -89,7 +83,7 @@ Iter skip_whitespace(Iter iter, Iter end)
 template<typename Iter>
 Iter skip_comment_line(Iter iter, Iter end)
 {
-    if (is_twochar(iter, end, '/', '/'))
+    if (is_chars(iter, end, "//"))
     {
         while(true)
         {
@@ -105,12 +99,12 @@ Iter skip_comment_line(Iter iter, Iter end)
 template<typename Iter>
 Iter skip_comment(Iter iter, Iter end)
 {
-    if (is_twochar(iter, end, '/', '*'))
+    if (is_chars(iter, end, "/*"))
     {
         iter = std::next(iter, 2);
         while(true)
         {
-            if (is_twochar(iter, end, '*', '/'))
+            if (is_chars(iter, end, "*/"))
             {
                 iter = std::next(iter, 2);
                 break;
