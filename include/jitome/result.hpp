@@ -39,7 +39,7 @@ struct Result
     {
         if(other.is_err())
         {
-            this->storage_ = other.as_err();
+            this->storage_ = error_type{other.as_err().msg};
         }
         else
         {
@@ -59,7 +59,7 @@ struct Result
     {
         if(other.is_err())
         {
-            this->storage_ = other.as_err();
+            this->storage_ = error_type{other.as_err().msg};
         }
         else
         {
