@@ -1,6 +1,8 @@
 #ifndef JITOME_RESULT_HPP
 #define JITOME_RESULT_HPP
+#include "traits.hpp"
 #include <optional>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <variant>
