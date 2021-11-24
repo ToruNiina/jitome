@@ -162,7 +162,7 @@ Result<Token> scan_immediate(Iter& iter, Iter end, std::shared_ptr<std::string> 
         }
     }
 
-    // immediate-real-fractional-part = %x2E 1*digit
+    // immediate-real-fractional-part = %x2E(.) 1*digit
     if(iter != end && *iter == '.')
     {
         iter = std::next(iter);
@@ -177,10 +177,15 @@ Result<Token> scan_immediate(Iter& iter, Iter end, std::shared_ptr<std::string> 
         }
     }
 
-    // immediate-real-exponent-part   = ( %x65 / %x45 ) 1*digit
+    // immediate-real-exponent-part   = ( E / e ) [(+/-)] 1*digit
     if(iter != end && (*iter == 'e' || *iter == 'E'))
     {
         iter = std::next(iter);
+
+        if(iter != end && (*iter == '+' || *iter == '-'))
+        {
+            iter = std::next(iter);
+        }
 
         if(iter == end || !std::isdigit(*iter))
         {
@@ -210,7 +215,7 @@ Result<Token> scan_identifier(Iter& iter, Iter end, std::shared_ptr<std::string>
     }
     iter = std::next(iter);
 
-    while(iter != end && std::isalpha(*iter))
+    while(iter != end && (std::isalnum(*iter) || *iter == '_'))
     {
         iter = std::next(iter);
     }
@@ -229,27 +234,33 @@ Result<Token> scan_operator(Iter& iter, Iter end, std::shared_ptr<std::string> s
 
     if(*iter == '+')
     {
-        return make_token(TokenKind::operator_plus, std::move(src), first, std::next(iter));
+        iter = std::next(iter);
+        return make_token(TokenKind::operator_plus, std::move(src), first, iter);
     }
     else if(*iter == '-')
     {
-        return make_token(TokenKind::operator_minus, std::move(src), first, std::next(iter));
+        iter = std::next(iter);
+        return make_token(TokenKind::operator_minus, std::move(src), first, iter);
     }
     else if(*iter == '*')
     {
-        return make_token(TokenKind::operator_multiply, std::move(src), first, std::next(iter));
+        iter = std::next(iter);
+        return make_token(TokenKind::operator_multiply, std::move(src), first, iter);
     }
     else if(*iter == '/')
     {
-        return make_token(TokenKind::operator_division, std::move(src), first, std::next(iter));
+        iter = std::next(iter);
+        return make_token(TokenKind::operator_division, std::move(src), first, iter);
     }
     else if(*iter == '(')
     {
-        return make_token(TokenKind::left_paren, std::move(src), first, std::next(iter));
+        iter = std::next(iter);
+        return make_token(TokenKind::left_paren, std::move(src), first, iter);
     }
     else if(*iter == ')')
     {
-        return make_token(TokenKind::right_paren, std::move(src), first, std::next(iter));
+        iter = std::next(iter);
+        return make_token(TokenKind::right_paren, std::move(src), first, iter);
     }
     return err("scan_operator: unknown operator.");
 }
@@ -282,8 +293,11 @@ inline Result<std::vector<Token>> tokenize(const std::string& str)
     std::shared_ptr<std::string> src = std::make_shared<std::string>(str);
 
     std::vector<Token> tks;
-    for(auto iter = src->begin(); iter != src->end(); ++iter)
+    auto iter = src->begin();
+    while(iter != src->end())
     {
+        if(*iter == '\0') {break;}
+
         if(auto tk = scan_token(iter, src->end(), src); tk.is_ok())
         {
             tks.push_back(std::move(tk.as_val()));
@@ -293,7 +307,7 @@ inline Result<std::vector<Token>> tokenize(const std::string& str)
             return err(tk.as_err().msg);
         }
     }
-    return tks;
+    return ok(tks);
 }
 
 } // jitome
