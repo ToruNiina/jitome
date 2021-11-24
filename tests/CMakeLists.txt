@@ -1,5 +1,6 @@
 set(TEST_NAMES
     test_result
+    test_tokenizer
     )
 
 foreach(TEST_NAME ${TEST_NAMES})
