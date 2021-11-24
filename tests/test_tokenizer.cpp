@@ -103,5 +103,166 @@ int main()
         boost::ut::expect(actual3 != test3.end() && *actual3 == 'A');
     };
 
+    "scan_immediate"_test = []
+    {
+        const auto test1 = std::make_shared<std::string>("1A");
+        const auto test2 = std::make_shared<std::string>("1.0123A");
+        const auto test3 = std::make_shared<std::string>("1.0123E+10A");
+
+        auto begin1 = test1->begin();
+        auto begin2 = test2->begin();
+        auto begin3 = test3->begin();
+
+        const auto actual1 = jitome::scan_immediate(begin1, test1->end(), test1).as_val();
+        const auto actual2 = jitome::scan_immediate(begin2, test2->end(), test2).as_val();
+        const auto actual3 = jitome::scan_immediate(begin3, test3->end(), test3).as_val();
+
+        boost::ut::expect(actual1.kind == jitome::TokenKind::immediate);
+        boost::ut::expect(actual2.kind == jitome::TokenKind::immediate);
+        boost::ut::expect(actual3.kind == jitome::TokenKind::immediate);
+
+        boost::ut::expect(actual1.str == "1");
+        boost::ut::expect(actual2.str == "1.0123");
+        boost::ut::expect(actual3.str == "1.0123E+10");
+
+        boost::ut::expect(actual1.begin == 0);
+        boost::ut::expect(actual2.begin == 0);
+        boost::ut::expect(actual3.begin == 0);
+
+        boost::ut::expect(actual1.len ==  1);
+        boost::ut::expect(actual2.len ==  6);
+        boost::ut::expect(actual3.len == 10);
+
+        boost::ut::expect(actual1.src == test1);
+        boost::ut::expect(actual2.src == test2);
+        boost::ut::expect(actual3.src == test3);
+    };
+
+    "scan_identifier"_test = []
+    {
+        const auto test1 = std::make_shared<std::string>("Foo");
+        const auto test2 = std::make_shared<std::string>("bar_baz");
+        const auto test3 = std::make_shared<std::string>("f123");
+
+        auto begin1 = test1->begin();
+        auto begin2 = test2->begin();
+        auto begin3 = test3->begin();
+
+        const auto actual1 = jitome::scan_identifier(begin1, test1->end(), test1).as_val();
+        const auto actual2 = jitome::scan_identifier(begin2, test2->end(), test2).as_val();
+        const auto actual3 = jitome::scan_identifier(begin3, test3->end(), test3).as_val();
+
+        boost::ut::expect(actual1.kind == jitome::TokenKind::identifier);
+        boost::ut::expect(actual2.kind == jitome::TokenKind::identifier);
+        boost::ut::expect(actual3.kind == jitome::TokenKind::identifier);
+
+        boost::ut::expect(actual1.str == "Foo");
+        boost::ut::expect(actual2.str == "bar_baz");
+        boost::ut::expect(actual3.str == "f123");
+
+        boost::ut::expect(actual1.begin == 0);
+        boost::ut::expect(actual2.begin == 0);
+        boost::ut::expect(actual3.begin == 0);
+
+        boost::ut::expect(actual1.len == 3);
+        boost::ut::expect(actual2.len == 7);
+        boost::ut::expect(actual3.len == 4);
+
+        boost::ut::expect(actual1.src == test1);
+        boost::ut::expect(actual2.src == test2);
+        boost::ut::expect(actual3.src == test3);
+    };
+
+    "scan_operator"_test = []
+    {
+        const auto test1 = std::make_shared<std::string>("+");
+        const auto test2 = std::make_shared<std::string>("-");
+        const auto test3 = std::make_shared<std::string>("()");
+
+        auto begin1 = test1->begin();
+        auto begin2 = test2->begin();
+        auto begin3 = test3->begin();
+
+        const auto actual1 = jitome::scan_operator(begin1, test1->end(), test1).as_val();
+        const auto actual2 = jitome::scan_operator(begin2, test2->end(), test2).as_val();
+        const auto actual3 = jitome::scan_operator(begin3, test3->end(), test3).as_val();
+
+        boost::ut::expect(actual1.kind == jitome::TokenKind::operator_plus);
+        boost::ut::expect(actual2.kind == jitome::TokenKind::operator_minus);
+        boost::ut::expect(actual3.kind == jitome::TokenKind::left_paren);
+
+        boost::ut::expect(actual1.str == "+");
+        boost::ut::expect(actual2.str == "-");
+        boost::ut::expect(actual3.str == "(");
+
+        boost::ut::expect(actual1.begin == 0);
+        boost::ut::expect(actual2.begin == 0);
+        boost::ut::expect(actual3.begin == 0);
+
+        boost::ut::expect(actual1.len == 1);
+        boost::ut::expect(actual2.len == 1);
+        boost::ut::expect(actual3.len == 1);
+
+        boost::ut::expect(actual1.src == test1);
+        boost::ut::expect(actual2.src == test2);
+        boost::ut::expect(actual3.src == test3);
+    };
+
+    "scan_token"_test = []
+    {
+        const auto test1 = std::make_shared<std::string>("+foo");
+        const auto test2 = std::make_shared<std::string>("bar-3");
+        const auto test3 = std::make_shared<std::string>("3.14*baz");
+
+        auto begin1 = test1->begin();
+        auto begin2 = test2->begin();
+        auto begin3 = test3->begin();
+
+        const auto actual1 = jitome::scan_token(begin1, test1->end(), test1).as_val();
+        const auto actual2 = jitome::scan_token(begin2, test2->end(), test2).as_val();
+        const auto actual3 = jitome::scan_token(begin3, test3->end(), test3).as_val();
+
+        boost::ut::expect(actual1.kind == jitome::TokenKind::operator_plus);
+        boost::ut::expect(actual2.kind == jitome::TokenKind::identifier);
+        boost::ut::expect(actual3.kind == jitome::TokenKind::immediate);
+
+        boost::ut::expect(actual1.str == "+");
+        boost::ut::expect(actual2.str == "bar");
+        boost::ut::expect(actual3.str == "3.14");
+
+        boost::ut::expect(actual1.begin == 0);
+        boost::ut::expect(actual2.begin == 0);
+        boost::ut::expect(actual3.begin == 0);
+
+        boost::ut::expect(actual1.len == 1);
+        boost::ut::expect(actual2.len == 3);
+        boost::ut::expect(actual3.len == 4);
+
+        boost::ut::expect(actual1.src == test1);
+        boost::ut::expect(actual2.src == test2);
+        boost::ut::expect(actual3.src == test3);
+    };
+
+    "tokenize"_test = []
+    {
+        const auto actual = jitome::tokenize("foo+bar-1.5");
+        boost::ut::expect(actual.is_ok());
+
+        const auto actual1 = actual.as_val();
+
+        boost::ut::expect(actual1.size() == 5);
+        boost::ut::expect(actual1.at(0).kind == jitome::TokenKind::identifier);
+        boost::ut::expect(actual1.at(1).kind == jitome::TokenKind::operator_plus);
+        boost::ut::expect(actual1.at(2).kind == jitome::TokenKind::identifier);
+        boost::ut::expect(actual1.at(3).kind == jitome::TokenKind::operator_minus);
+        boost::ut::expect(actual1.at(4).kind == jitome::TokenKind::immediate);
+
+        boost::ut::expect(actual1.at(0).str == "foo");
+        boost::ut::expect(actual1.at(1).str == "+");
+        boost::ut::expect(actual1.at(2).str == "bar");
+        boost::ut::expect(actual1.at(3).str == "-");
+        boost::ut::expect(actual1.at(4).str == "1.5");
+    };
+
     return 0;
 }
