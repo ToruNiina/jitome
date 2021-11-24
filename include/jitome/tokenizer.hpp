@@ -1,5 +1,6 @@
 #ifndef JITOME_TOKENIZER_HPP
 #define JITOME_TOKENIZER_HPP
+#include "result.hpp"
 #include <memory>
 #include <string>
 #include <string_view>
@@ -37,13 +38,13 @@ Token make_token(TokenKind k, std::shared_ptr<std::string> src, Iter first, Iter
     std::string_view whole(*src);
     std::size_t begin = std::distance(src->begin(), first);
     std::size_t len   = std::distance(first, last);
-    return Token{k, whole.substr(begin, len), len, std::move(src)};
+    return Token{k, whole.substr(begin, len), begin, len, std::move(src)};
 }
 
 template<typename Iter, std::size_t N>
 bool is_chars(Iter iter, Iter end, const char (&cs)[N])
 {
-    for(std::size_t i=0; i<N; ++i)
+    for(std::size_t i=0; i<N-1; ++i) // N-1 for null character
     {
         if(iter == end || *iter != cs[i]) {return false;}
         ++iter;
@@ -85,7 +86,7 @@ Iter skip_comment_line(Iter iter, Iter end)
 {
     if (is_chars(iter, end, "//"))
     {
-        while(true)
+        while(iter != end)
         {
             if(is_newline(iter, end))
             {
@@ -102,7 +103,7 @@ Iter skip_comment(Iter iter, Iter end)
     if (is_chars(iter, end, "/*"))
     {
         iter = std::next(iter, 2);
-        while(true)
+        while(iter != end)
         {
             if (is_chars(iter, end, "*/"))
             {
@@ -118,7 +119,7 @@ Iter skip_comment(Iter iter, Iter end)
 template<typename Iter>
 Iter skip_negligible(Iter iter, Iter end)
 {
-    while(true)
+    while(iter != end)
     {
         const auto front = iter;
         iter = skip_comment     (iter, end);
@@ -256,7 +257,7 @@ Result<Token> scan_operator(Iter& iter, Iter end, std::shared_ptr<std::string> s
 template<typename Iter>
 Result<Token> scan_token(Iter& iter, Iter end, std::shared_ptr<std::string> src)
 {
-    std::tie(iter, line, column) = skip_negligible(iter, end, line, column, src);
+    iter = skip_negligible(iter, end);
     if(iter == end)
     {
         return err("There is no token left.");
@@ -264,15 +265,15 @@ Result<Token> scan_token(Iter& iter, Iter end, std::shared_ptr<std::string> src)
 
     if(std::isdigit(*iter))
     {
-        return scan_immediate(iter, end, line, column);
+        return scan_immediate(iter, end, std::move(src));
     }
     else if(std::isalpha(*iter))
     {
-        return scan_identifier(iter, end, line, column);
+        return scan_identifier(iter, end, std::move(src));
     }
     else
     {
-        return scan_operator(iter, end, line, column);
+        return scan_operator(iter, end, std::move(src));
     }
 }
 
@@ -280,12 +281,16 @@ inline Result<std::vector<Token>> tokenize(const std::string& str)
 {
     std::shared_ptr<std::string> src = std::make_shared<std::string>(str);
 
-    std::vector<token> tks;
+    std::vector<Token> tks;
     for(auto iter = src->begin(); iter != src->end(); ++iter)
     {
-        if(auto tk = scan_token(iter, src->end()); tk.is_ok())
+        if(auto tk = scan_token(iter, src->end(), src); tk.is_ok())
         {
             tks.push_back(std::move(tk.as_val()));
+        }
+        else
+        {
+            return err(tk.as_err().msg);
         }
     }
     return tks;
