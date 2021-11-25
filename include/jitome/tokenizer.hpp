@@ -1,6 +1,8 @@
 #ifndef JITOME_TOKENIZER_HPP
 #define JITOME_TOKENIZER_HPP
+#include "error.hpp"
 #include "result.hpp"
+#include "token.hpp"
 #include <memory>
 #include <string>
 #include <string_view>
@@ -10,36 +12,6 @@
 
 namespace jitome
 {
-
-enum class TokenKind
-{
-    immediate,
-    identifier,
-    operator_plus,
-    operator_minus,
-    operator_multiply,
-    operator_division,
-    left_paren,
-    right_paren,
-    comma
-};
-
-struct Token
-{
-    TokenKind  kind;
-    std::string_view str;
-    std::size_t begin, len; // region index
-    std::shared_ptr<std::string> src;
-};
-
-template<typename Iter>
-Token make_token(TokenKind k, std::shared_ptr<std::string> src, Iter first, Iter last)
-{
-    std::string_view whole(*src);
-    std::size_t begin = std::distance(src->begin(), first);
-    std::size_t len   = std::distance(first, last);
-    return Token{k, whole.substr(begin, len), begin, len, std::move(src)};
-}
 
 template<typename Iter, std::size_t N>
 bool is_chars(Iter iter, Iter end, const char (&cs)[N])
@@ -51,6 +23,26 @@ bool is_chars(Iter iter, Iter end, const char (&cs)[N])
     }
     return true;
 }
+
+template<typename Iter, std::size_t N>
+bool is_oneof(Iter iter, Iter end, const char (&cs)[N])
+{
+    static_assert(1 <= N);
+    if(iter == end)
+    {
+        return false;
+    }
+
+    for(std::size_t i=0; i<N-1; ++i) // N-1 for null character
+    {
+        if(*iter == cs[i])
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 template<typename Iter>
 bool is_newline(Iter iter, Iter end)
@@ -197,7 +189,7 @@ Result<Token> scan_immediate(Iter& iter, Iter end, std::shared_ptr<std::string> 
         }
     }
 
-    return make_token(TokenKind::immediate, std::move(src), first, iter);
+    return make_token(TokenKind::Immediate, first, iter, std::move(src));
 }
 
 template<typename Iter>
@@ -220,7 +212,7 @@ Result<Token> scan_identifier(Iter& iter, Iter end, std::shared_ptr<std::string>
         iter = std::next(iter);
     }
 
-    return make_token(TokenKind::identifier, std::move(src), first, iter);
+    return make_token(TokenKind::Identifier, first, iter, std::move(src));
 }
 
 template<typename Iter>
@@ -232,37 +224,23 @@ Result<Token> scan_operator(Iter& iter, Iter end, std::shared_ptr<std::string> s
     }
     const auto first = iter;
 
-    if(*iter == '+')
+    if(is_oneof(iter, end, "+-*/"))
     {
         iter = std::next(iter);
-        return make_token(TokenKind::operator_plus, std::move(src), first, iter);
-    }
-    else if(*iter == '-')
-    {
-        iter = std::next(iter);
-        return make_token(TokenKind::operator_minus, std::move(src), first, iter);
-    }
-    else if(*iter == '*')
-    {
-        iter = std::next(iter);
-        return make_token(TokenKind::operator_multiply, std::move(src), first, iter);
-    }
-    else if(*iter == '/')
-    {
-        iter = std::next(iter);
-        return make_token(TokenKind::operator_division, std::move(src), first, iter);
+        return make_token(TokenKind::Operator, first, iter, std::move(src));
     }
     else if(*iter == '(')
     {
         iter = std::next(iter);
-        return make_token(TokenKind::left_paren, std::move(src), first, iter);
+        return make_token(TokenKind::LeftBracket, first, iter, std::move(src));
     }
     else if(*iter == ')')
     {
         iter = std::next(iter);
-        return make_token(TokenKind::right_paren, std::move(src), first, iter);
+        return make_token(TokenKind::RightBracket, first, iter, std::move(src));
     }
-    return err("scan_operator: unknown operator.");
+    return err(make_error_message("scan_operator: unknown operator appeared",
+        make_token(TokenKind::Invalid, iter, std::next(iter), std::move(src))));
 }
 
 template<typename Iter>
@@ -273,6 +251,7 @@ Result<Token> scan_token(Iter& iter, Iter end, std::shared_ptr<std::string> src)
     {
         return err("There is no token left.");
     }
+    assert(*iter != '\0');
 
     if(std::isdigit(*iter))
     {
@@ -282,9 +261,14 @@ Result<Token> scan_token(Iter& iter, Iter end, std::shared_ptr<std::string> src)
     {
         return scan_identifier(iter, end, std::move(src));
     }
-    else
+    else if(is_oneof(iter, end, "+-*/()"))
     {
         return scan_operator(iter, end, std::move(src));
+    }
+    else
+    {
+        return err(make_error_message("scan_token: unknown token appeared",
+            make_token(TokenKind::Invalid, iter, std::next(iter), std::move(src))));
     }
 }
 
@@ -298,7 +282,9 @@ inline Result<std::vector<Token>> tokenize(const std::string& str)
     {
         if(*iter == '\0') {break;}
 
-        if(auto tk = scan_token(iter, src->end(), src); tk.is_ok())
+        auto tk = scan_token(iter, src->end(), src);
+
+        if(tk.is_ok())
         {
             tks.push_back(std::move(tk.as_val()));
         }
