@@ -1,4 +1,5 @@
 set(TEST_NAMES
+    test_eval
     test_result
     test_tokenizer
     )
