@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include <vector>
+#include <deque>
 #include <cassert>
 #include <cctype>
 
@@ -272,11 +272,11 @@ Result<Token> scan_token(Iter& iter, Iter end, std::shared_ptr<std::string> src)
     }
 }
 
-inline Result<std::vector<Token>> tokenize(const std::string& str)
+inline Result<std::deque<Token>> tokenize(const std::string& str)
 {
     std::shared_ptr<std::string> src = std::make_shared<std::string>(str);
 
-    std::vector<Token> tks;
+    std::deque<Token> tks;
     auto iter = src->begin();
     while(iter != src->end())
     {
