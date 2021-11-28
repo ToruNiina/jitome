@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <ostream>
 
 namespace jitome
 {
@@ -34,6 +35,21 @@ inline std::ostream& operator<<(std::ostream& os, TokenKind k)
     return os;
 }
 
+inline std::string to_string(TokenKind k)
+{
+    switch(k)
+    {
+        case TokenKind::Immediate   : {return std::string("Immediate"   );}
+        case TokenKind::Identifier  : {return std::string("Identifier"  );}
+        case TokenKind::Operator    : {return std::string("Operator"    );}
+        case TokenKind::LeftBracket : {return std::string("LeftBracket ");}
+        case TokenKind::RightBracket: {return std::string("RightBracket");}
+        case TokenKind::Comma       : {return std::string("Comma"       );}
+        case TokenKind::Invalid     : {return std::string("Invalid"     );}
+    }
+    return "Unknown";
+}
+
 struct Token
 {
     TokenKind  kind;
@@ -49,6 +65,12 @@ Token make_token(TokenKind k, Iter first, Iter last, std::shared_ptr<std::string
     std::size_t begin = std::distance(src->begin(), first);
     std::size_t len   = std::distance(first, last);
     return Token{k, whole.substr(begin, len), begin, len, std::move(src)};
+}
+
+inline std::ostream& operator<<(std::ostream& os, Token tk)
+{
+    os << "Token{" << tk.kind << ":" << tk.str << "}";
+    return os;
 }
 
 } // jitome
