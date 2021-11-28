@@ -1,8 +1,10 @@
 #ifndef JITOME_PARSER_HPP
 #define JITOME_PARSER_HPP
+#include "ast.hpp"
 #include "tokenizer.hpp"
 #include <memory>
 #include <string>
+#include <sstream>
 #include <string_view>
 #include <deque>
 #include <cassert>
@@ -17,7 +19,25 @@ inline Result<Node> parse_primary(std::deque<Token>& tokens)
     if(tokens.front().kind == TokenKind::LeftBracket)
     {
         tokens.pop_front();
-        return parse_expr(tokens);
+        auto expr = parse_expr(tokens);
+        if(tokens.front().kind == TokenKind::RightBracket)
+        {
+            tokens.pop_front();
+            return expr;
+        }
+        else
+        {
+            if(tokens.empty())
+            {
+                return err("parse_primary: expected right bracket `)`, but EOF is found");
+            }
+            else
+            {
+                return err(make_error_message(
+                    "parse_primary: expected right bracket `)`, but found:",
+                    tokens.front()));
+            }
+        }
     }
     else if(tokens.front().kind == TokenKind::Immediate)
     {
@@ -27,82 +47,104 @@ inline Result<Node> parse_primary(std::deque<Token>& tokens)
         iss >> imm;
 
         tokens.pop_front();
-        return NodeImmediate{imm};
+        return ok(Node{NodeImmediate{imm}});
     }
     return err(make_error_message("parse_primary: unexpected token appeared",
-                                  tokens.front();));
+                                  tokens.front()));
 }
 
 Result<Node> parse_mul(std::deque<Token>& tokens)
 {
     auto lhs = parse_primary(tokens);
 
-    if(tokens.empty())
+    if(lhs.is_err())
     {
-        return ok(std::move(lhs));
+        return lhs;
     }
 
-    if(tokens.front() == TokenKind::Operator && tokens.front().str == "*")
+    while(not tokens.empty())
     {
-        tokens.pop_front();
-        auto rhs = parse_primary(tokens);
+        if(tokens.front().kind == TokenKind::Operator && tokens.front().str == "*")
+        {
+            tokens.pop_front();
+            auto rhs = parse_primary(tokens);
+            if(rhs.is_err())
+            {
+                return rhs;
+            }
 
-        auto node = Node{NodeExpression<Multiplication, 2>{
-            {{std::make_unique<Node>(std::move(lhs)),
-              std::make_unique<Node>(std::move(rhs))}};
-        }};
-        return ok(std::move(node));
+            lhs = Node{NodeExpression<Multiplication, 2>{
+                {{make_node_ptr(std::move(lhs.as_val())),
+                  make_node_ptr(std::move(rhs.as_val()))}}
+            }};
+        }
+        else if(tokens.front().kind == TokenKind::Operator && tokens.front().str == "/")
+        {
+            tokens.pop_front();
+            auto rhs = parse_primary(tokens);
+            if(rhs.is_err())
+            {
+                return rhs;
+            }
+
+            lhs = Node{NodeExpression<Division, 2>{
+                {{make_node_ptr(std::move(lhs.as_val())),
+                  make_node_ptr(std::move(rhs.as_val()))}}
+            }};
+        }
+        else
+        {
+            return lhs;
+        }
     }
-    else if(tokens.front() == TokenKind::Operator && tokens.front().str == "/")
-    {
-        tokens.pop_front();
-        auto rhs = parse_primary(tokens);
-
-        auto node = Node{NodeExpression<Division, 2>{
-            {{std::make_unique<Node>(std::move(lhs)),
-              std::make_unique<Node>(std::move(rhs))}};
-        }};
-        return ok(std::move(node));
-
-    }
-
-    return err(make_error_message("parse_mul: unexpected token appeared",
-                                  tokens.front();));
+    return lhs;
 }
 
 Result<Node> parse_expr(std::deque<Token>& tokens)
 {
-    auto node = parse_mul(tokens);
+    auto lhs = parse_mul(tokens);
 
-    if(tokens.empty())
+    if(lhs.is_err())
     {
-        return ok(std::move(node));
+        return lhs;
     }
 
-    if(tokens.front().kind == TokenKind::Operator && tokens.str == "+"sv)
+    while(not tokens.empty())
     {
-        tokens.pop_front(); // +
-        auto rhs = parse_mul(tokens);
+        if(tokens.front().kind == TokenKind::Operator && tokens.front().str == "+")
+        {
+            tokens.pop_front(); // +
+            auto rhs = parse_mul(tokens);
+            if(rhs.is_err())
+            {
+                return rhs;
+            }
 
-        node = Node{NodeExpression<Addition, 2>{
-            {{std::make_unique<Node>(std::move(node)),
-              std::make_unique<Node>(std::move(rhs))}};
-        }};
-        return ok(std::move(node));
-    }
-    else if(tokens.front().kind == TokenKind::Operator && tokens.str == "-"sv)
-    {
-        tokens.pop_front(); // -
-        auto rhs = parse_mul(tokens);
+            lhs = Node{NodeExpression<Addition, 2>{
+                {{make_node_ptr(std::move(lhs.as_val())),
+                  make_node_ptr(std::move(rhs.as_val()))}}
+            }};
+        }
+        else if(tokens.front().kind == TokenKind::Operator && tokens.front().str == "-")
+        {
+            tokens.pop_front(); // -
+            auto rhs = parse_mul(tokens);
+            if(rhs.is_err())
+            {
+                return rhs;
+            }
 
-        node = Node{NodeExpression<Subtraction, 2>{
-            {{std::make_unique<Node>(std::move(node)),
-              std::make_unique<Node>(std::move(rhs))}};
-        }};
-        return ok(std::move(node));
+            lhs = Node{NodeExpression<Subtraction, 2>{
+                {{make_node_ptr(std::move(lhs.as_val())),
+                  make_node_ptr(std::move(rhs.as_val()))}}
+            }};
+        }
+        else
+        {
+            return lhs;
+        }
     }
-    return err(make_error_message("parse_expr: unexpected token appeared",
-                                  tokens.front();));
+    return lhs;
 }
 
 inline Result<Node> parse(std::deque<Token> tokens)
