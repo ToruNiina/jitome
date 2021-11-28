@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS       OFF) # not gnu11, c++11
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/extlib/ut/include)
+include_directories(${PROJECT_SOURCE_DIR}/extlib/xbyak/xbyak)
 
 execute_process(COMMAND git submodule update --init --recursive
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

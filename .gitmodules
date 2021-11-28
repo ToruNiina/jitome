@@ -1,3 +1,6 @@
 [submodule "extlib/ut"]
 	path = extlib/ut
 	url = https://github.com/boost-ext/ut.git
+[submodule "extlib/xbyak"]
+	path = extlib/xbyak
+	url = https://github.com/herumi/xbyak.git
