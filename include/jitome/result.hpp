@@ -85,12 +85,12 @@ struct Result
     bool is_val() const noexcept {return storage_.index() == 0;}
     bool is_err() const noexcept {return storage_.index() == 1;}
 
-    value_type&       as_val() &      {return std::get<0>(storage_);}
-    error_type&       as_err() &      {return std::get<1>(storage_);}
-    value_type const& as_val() const& {return std::get<0>(storage_);}
-    error_type const& as_err() const& {return std::get<1>(storage_);}
-    value_type&&      as_val() &&     {return std::move(std::get<0>(storage_));}
-    error_type&&      as_err() &&     {return std::move(std::get<1>(storage_));}
+    value_type&       as_val() &      {if(!this->is_val()) {throw std::runtime_error("Result: bad as_val()");} return std::get<0>(storage_);}
+    error_type&       as_err() &      {if(!this->is_err()) {throw std::runtime_error("Result: bad as_err()");} return std::get<1>(storage_);}
+    value_type const& as_val() const& {if(!this->is_val()) {throw std::runtime_error("Result: bad as_val()");} return std::get<0>(storage_);}
+    error_type const& as_err() const& {if(!this->is_err()) {throw std::runtime_error("Result: bad as_err()");} return std::get<1>(storage_);}
+    value_type&&      as_val() &&     {if(!this->is_val()) {throw std::runtime_error("Result: bad as_val()");} return std::move(std::get<0>(storage_));}
+    error_type&&      as_err() &&     {if(!this->is_err()) {throw std::runtime_error("Result: bad as_err()");} return std::move(std::get<1>(storage_));}
 
   private:
 
