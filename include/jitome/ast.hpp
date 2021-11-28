@@ -13,10 +13,28 @@ struct Node;
 struct NodeArgument
 {
     std::string name;
+
+    bool operator==(const NodeArgument& other) const noexcept
+    {
+        return this->name == other.name;
+    }
+    bool operator!=(const NodeArgument& other) const noexcept
+    {
+        return this->name != other.name;
+    }
 };
 struct NodeImmediate
 {
     double value;
+
+    bool operator==(const NodeImmediate& other) const noexcept
+    {
+        return this->value == other.value;
+    }
+    bool operator!=(const NodeImmediate& other) const noexcept
+    {
+        return this->value != other.value;
+    }
 };
 
 template<typename Func, std::size_t N>
@@ -25,7 +43,35 @@ struct NodeExpression
     using func_type = Func;
     static constexpr inline std::size_t size = N;
     std::array<std::unique_ptr<Node>, N> operands;
+
+    bool operator==(const NodeExpression& other) const noexcept
+    {
+        for(std::size_t i=0; i<N; ++i)
+        {
+            if(this->operands[i] == nullptr)
+            {
+                if(other.operands[i] != nullptr)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if(other.operands[i] == nullptr ||
+                   *(this->operands[i]) != *(other.operands[i]))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    bool operator!=(const NodeExpression& other) const noexcept
+    {
+        return !(*this == other);
+    }
 };
+
 template<typename T> struct is_expr_node : std::false_type {};
 template<typename F, std::size_t N>
 struct is_expr_node<NodeExpression<F, N>> : std::true_type {};
@@ -66,6 +112,15 @@ struct Node
         NodeExpression<Division,       2>,
         NodeExpression<Negation,       1>
         > node;
+
+    bool operator==(const Node& other) const noexcept
+    {
+        return this->node == other.node;
+    }
+    bool operator!=(const Node& other) const noexcept
+    {
+        return this->node != other.node;
+    }
 };
 
 template<typename T>
