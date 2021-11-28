@@ -51,7 +51,7 @@ inline std::string show_line_in_err_msg(const std::string& str)
     return retval;
 }
 
-inline std::string make_error_message(std::string msg, const Token& tk)
+inline std::string show_token_position(const Token& tk)
 {
     using namespace std::literals::string_literals;
 
@@ -70,7 +70,7 @@ inline std::string make_error_message(std::string msg, const Token& tk)
             line += 1;
         }
     }
-    const auto column = std::min<std::int64_t>(0, std::distance(last_newline, first)) + 1;
+    const auto column = std::max<std::int64_t>(0, std::distance(last_newline, first)) + 1;
 
     auto line_begin = newline_found ? std::next(last_newline) : last_newline;
     auto line_end   = std::find(last_newline, tk.src->cend(), '\n');
@@ -78,17 +78,23 @@ inline std::string make_error_message(std::string msg, const Token& tk)
 
     const auto lnw = std::to_string(line).size();
 
-    // [error] msg
-    //    |
-    // LN | line contents
-    //    |      ^^^
+    std::string msg;
+    msg += std::string(lnw, ' ') + " |\n"s;
+    msg += std::to_string(line)  + " | "s + show_line_in_err_msg(content) + "\n"s;
+    msg += std::string(lnw, ' ') + " |"s + std::string(column, ' ') +
+             std::string(tk.len, '^') + "- token: "s + to_string(tk.kind) +
+             "["s + std::string(tk.str) + "]"s;
+
+    return msg;
+}
+
+inline std::string make_error_message(std::string msg, const Token& tk)
+{
+    using namespace std::literals::string_literals;
 
     std::string error;
     error += "[error] " + msg + "\n"s;
-    error += std::string(lnw, ' ') + " |\n"s;
-    error += std::to_string(line)  + " | "s + show_line_in_err_msg(content) + "\n"s;
-    error += std::string(lnw, ' ') + " |"s + std::string(column, ' ') + std::string(tk.len, '^');
-
+    error += show_token_position(tk);
     return error;
 }
 
