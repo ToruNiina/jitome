@@ -89,12 +89,13 @@ constexpr inline bool is_expr_node_v = is_expr_node<remove_cvref_t<T>>::value;
     {                                                            \
         static inline double invoke(double x, double y) noexcept \
         {return (expr);}                                         \
-    }
+    };                                                           \
+    using Node ## name = NodeExpression<name, 2>;             /**/
 
-JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Addition,       (x+y));
-JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Subtraction,    (x-y));
-JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Multiplication, (x*y));
-JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Division,       (x/y));
+JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Addition,       (x+y))
+JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Subtraction,    (x-y))
+JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Multiplication, (x*y))
+JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Division,       (x/y))
 #undef JITOME_DEFINE_BINARY_OPERATION_FUNCTION
 
 #define JITOME_DEFINE_UNARY_OPERATION_FUNCTION(name, expr) \
@@ -102,9 +103,10 @@ JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Division,       (x/y));
     {                                                      \
         static inline double invoke(double x) noexcept     \
         {return (expr);}                                   \
-    }
+    };                                                     \
+    using Node ## name = NodeExpresison<name, 1>;       /**/
 
-JITOME_DEFINE_UNARY_OPERATION_FUNCTION(Negation, (-x));
+JITOME_DEFINE_UNARY_OPERATION_FUNCTION(Negation, (-x))
 #undef JITOME_DEFINE_UNARY_OPERATION_FUNCTION
 
 struct Node
@@ -112,11 +114,11 @@ struct Node
     std::variant<
         NodeArgument,
         NodeImmediate,
-        NodeExpression<Addition,       2>,
-        NodeExpression<Subtraction,    2>,
-        NodeExpression<Multiplication, 2>,
-        NodeExpression<Division,       2>,
-        NodeExpression<Negation,       1>
+        NodeAddition,
+        NodeSubtraction,
+        NodeMultiplication,
+        NodeDivision,
+        NodeNegation
         > node;
 
     bool operator==(const Node& other) const noexcept

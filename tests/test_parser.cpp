@@ -11,7 +11,7 @@ int main()
     "add"_test = []
     {
         jitome::Node expect{
-            jitome::NodeExpression<jitome::Addition, 2>{
+            jitome::NodeAddition{
                 jitome::NodeImmediate{3.14},
                 jitome::NodeImmediate{2.71}
             }
@@ -37,8 +37,8 @@ int main()
     "add"_test = []
     {
         jitome::Node expect{
-            jitome::NodeExpression<jitome::Addition, 2>{
-                jitome::Node{jitome::NodeExpression<jitome::Addition, 2>{
+            jitome::NodeAddition{
+                jitome::Node{jitome::NodeAddition{
                         jitome::NodeImmediate{1.00},
                         jitome::NodeImmediate{3.14}
                     }},
@@ -66,9 +66,9 @@ int main()
     "dep"_test = []
     {
         jitome::Node expect{
-            jitome::NodeExpression<jitome::Multiplication, 2>{
+            jitome::NodeMultiplication{
                 jitome::NodeImmediate{2.0},
-                jitome::NodeExpression<jitome::Addition, 2>{
+                jitome::NodeAddition{
                     jitome::NodeImmediate{3.14},
                     jitome::NodeImmediate{2.71}
                 }

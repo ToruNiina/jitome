@@ -73,7 +73,7 @@ Result<Node> parse_mul(std::deque<Token>& tokens)
                 return rhs;
             }
 
-            lhs = Node{NodeExpression<Multiplication, 2>{
+            lhs = Node{NodeMultiplication{
                 std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
@@ -86,7 +86,7 @@ Result<Node> parse_mul(std::deque<Token>& tokens)
                 return rhs;
             }
 
-            lhs = Node{NodeExpression<Division, 2>{
+            lhs = Node{NodeDivision{
                 std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
@@ -118,7 +118,7 @@ Result<Node> parse_expr(std::deque<Token>& tokens)
                 return rhs;
             }
 
-            lhs = Node{NodeExpression<Addition, 2>{
+            lhs = Node{NodeAddition{
                 std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
@@ -131,7 +131,7 @@ Result<Node> parse_expr(std::deque<Token>& tokens)
                 return rhs;
             }
 
-            lhs = Node{NodeExpression<Subtraction, 2>{
+            lhs = Node{NodeSubtraction{
                 std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
