@@ -14,6 +14,24 @@ inline std::string show_char_in_err_msg(const char c)
     {
         return std::string(1, c);
     }
+
+    if(c == ' ')
+    {
+        return std::string(" ");
+    }
+    else if(c == '\t')
+    {
+        return std::string("\\t");
+    }
+    else if(c == '\r')
+    {
+        return std::string("\\r");
+    }
+    else if(c == '\0')
+    {
+        return std::string("\\0");
+    }
+
     const int hi = c / 16;
     const int lo = c % 16;
 
