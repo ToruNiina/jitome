@@ -42,7 +42,13 @@ struct NodeExpression
 {
     using func_type = Func;
     static constexpr inline std::size_t size = N;
+
     std::array<std::unique_ptr<Node>, N> operands;
+
+    template<typename ... Ts>
+    NodeExpression(Ts&&... args)
+        : operands{{std::make_unique<Node>(Node{std::forward<Ts>(args)}) ...}}
+    {}
 
     bool operator==(const NodeExpression& other) const noexcept
     {

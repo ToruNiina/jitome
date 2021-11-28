@@ -74,8 +74,7 @@ Result<Node> parse_mul(std::deque<Token>& tokens)
             }
 
             lhs = Node{NodeExpression<Multiplication, 2>{
-                {{make_node_ptr(std::move(lhs.as_val())),
-                  make_node_ptr(std::move(rhs.as_val()))}}
+                std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
         else if(tokens.front().kind == TokenKind::Operator && tokens.front().str == "/")
@@ -88,8 +87,7 @@ Result<Node> parse_mul(std::deque<Token>& tokens)
             }
 
             lhs = Node{NodeExpression<Division, 2>{
-                {{make_node_ptr(std::move(lhs.as_val())),
-                  make_node_ptr(std::move(rhs.as_val()))}}
+                std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
         else
@@ -121,8 +119,7 @@ Result<Node> parse_expr(std::deque<Token>& tokens)
             }
 
             lhs = Node{NodeExpression<Addition, 2>{
-                {{make_node_ptr(std::move(lhs.as_val())),
-                  make_node_ptr(std::move(rhs.as_val()))}}
+                std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
         else if(tokens.front().kind == TokenKind::Operator && tokens.front().str == "-")
@@ -135,8 +132,7 @@ Result<Node> parse_expr(std::deque<Token>& tokens)
             }
 
             lhs = Node{NodeExpression<Subtraction, 2>{
-                {{make_node_ptr(std::move(lhs.as_val())),
-                  make_node_ptr(std::move(rhs.as_val()))}}
+                std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
         else

@@ -11,8 +11,8 @@ int main()
     {
         jitome::Node root{
             jitome::NodeExpression<jitome::Addition, 2>{
-                {{jitome::make_node_ptr(jitome::NodeImmediate{3.14}),
-                  jitome::make_node_ptr(jitome::NodeImmediate{2.71})}}
+                jitome::NodeImmediate{3.14},
+                jitome::NodeImmediate{2.71}
             }
         };
 
@@ -24,12 +24,11 @@ int main()
     {
         jitome::Node root{
             jitome::NodeExpression<jitome::Multiplication, 2>{
-                {{jitome::make_node_ptr(jitome::NodeImmediate{2.0}),
-                  jitome::make_node_ptr(jitome::NodeExpression<jitome::Addition, 2>{
-                        {{jitome::make_node_ptr(jitome::NodeImmediate{3.14}),
-                          jitome::make_node_ptr(jitome::NodeImmediate{2.71})}}
-                    })
-                }}
+                jitome::NodeImmediate{2.0},
+                jitome::NodeExpression<jitome::Addition, 2>{
+                        jitome::NodeImmediate{3.14},
+                        jitome::NodeImmediate{2.71}
+                }
             }
         };
 
