@@ -26,7 +26,7 @@ double invoke_func(std::map<std::string, double>& env, const NodeExpression<F, N
     return invoke_func_impl(env, node, std::make_index_sequence<N>{});
 }
 
-double evaluate(std::map<std::string, double>& env, const Node& root)
+inline double evaluate(std::map<std::string, double>& env, const Node& root)
 {
     return std::visit([&env] (const auto& node) {
         if constexpr (is_typeof<decltype(node), NodeArgument>)

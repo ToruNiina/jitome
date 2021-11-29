@@ -53,7 +53,7 @@ inline Result<Node> parse_primary(std::deque<Token>& tokens)
                                   tokens.front()));
 }
 
-Result<Node> parse_mul(std::deque<Token>& tokens)
+inline Result<Node> parse_mul(std::deque<Token>& tokens)
 {
     auto lhs = parse_primary(tokens);
 
@@ -98,7 +98,7 @@ Result<Node> parse_mul(std::deque<Token>& tokens)
     return lhs;
 }
 
-Result<Node> parse_expr(std::deque<Token>& tokens)
+inline Result<Node> parse_expr(std::deque<Token>& tokens)
 {
     auto lhs = parse_mul(tokens);
 
