@@ -3,7 +3,7 @@
 ident = alpha *(alpha / underscore / digit)
 
 function               = function-argument-list function-body ; (a, b) {a + b}
-function-body          = curry-open *negligible expression *negligible curry-close
+function-body          = curly-open *negligible expression *negligible curly-close
 function-arguments     = paren-open *negligible ?function-argument-list *negligible paren-close
 function-argument-list = function-argument *( *negligible comma *negligible function-argument )
 function-argument      = ident
@@ -47,8 +47,8 @@ operator-power       = %x5E ; ^
 
 paren-open  = %x28 ; (
 paren-close = %x29 ; )
-curry-open  = %x7B ; {
-curry-close = %x7D ; }
+curly-open  = %x7B ; {
+curly-close = %x7D ; }
 
 ; /* comment */
 comment = comment-start-symbol *comment-content-characters comment-stop-symbol ; /* ... */
