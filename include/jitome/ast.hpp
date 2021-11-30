@@ -10,15 +10,15 @@ namespace jitome
 
 struct Node;
 
-struct NodeArgument
+struct NodeVariable
 {
     std::string name;
 
-    bool operator==(const NodeArgument& other) const noexcept
+    bool operator==(const NodeVariable& other) const noexcept
     {
         return this->name == other.name;
     }
-    bool operator!=(const NodeArgument& other) const noexcept
+    bool operator!=(const NodeVariable& other) const noexcept
     {
         return this->name != other.name;
     }
@@ -109,16 +109,35 @@ JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Division,       (x/y))
 JITOME_DEFINE_UNARY_OPERATION_FUNCTION(Negation, (-x))
 #undef JITOME_DEFINE_UNARY_OPERATION_FUNCTION
 
+struct NodeFuncDef
+{
+    std::string              name;
+    std::vector<std::string> args;
+    std::unique_ptr<Node>    body;
+
+    bool operator==(const NodeImmediate& other) const noexcept
+    {
+        return this->args == other.args &&
+            this->body != nullptr && other.body != nullptr &&
+            *(this->body)== *(other.body);
+    }
+    bool operator!=(const NodeImmediate& other) const noexcept
+    {
+        return !(*this == other);
+    }
+};
+
 struct Node
 {
     std::variant<
-        NodeArgument,
+        NodeVariable,
         NodeImmediate,
         NodeAddition,
         NodeSubtraction,
         NodeMultiplication,
         NodeDivision,
-        NodeNegation
+        NodeNegation,
+        NodeFunction
         > node;
 
     bool operator==(const Node& other) const noexcept
