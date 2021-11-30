@@ -16,6 +16,8 @@ enum class TokenKind
     Operator,
     LeftBracket,
     RightBracket,
+    LeftCurly,
+    RightCurly,
     Comma,
     Invalid
 };
@@ -29,6 +31,8 @@ inline std::ostream& operator<<(std::ostream& os, TokenKind k)
         case TokenKind::Operator    : {os << "Operator"    ; break;}
         case TokenKind::LeftBracket : {os << "LeftBracket "; break;}
         case TokenKind::RightBracket: {os << "RightBracket"; break;}
+        case TokenKind::LeftCurly   : {os << "LeftCurly "  ; break;}
+        case TokenKind::RightCurly  : {os << "RightCurly"  ; break;}
         case TokenKind::Comma       : {os << "Comma"       ; break;}
         case TokenKind::Invalid     : {os << "Invalid"     ; break;}
     }
@@ -44,6 +48,8 @@ inline std::string to_string(TokenKind k)
         case TokenKind::Operator    : {return std::string("Operator"    );}
         case TokenKind::LeftBracket : {return std::string("LeftBracket ");}
         case TokenKind::RightBracket: {return std::string("RightBracket");}
+        case TokenKind::LeftCurly   : {return std::string("LeftCurly "  );}
+        case TokenKind::RightCurly  : {return std::string("RightCurly"  );}
         case TokenKind::Comma       : {return std::string("Comma"       );}
         case TokenKind::Invalid     : {return std::string("Invalid"     );}
     }

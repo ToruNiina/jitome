@@ -239,6 +239,16 @@ Result<Token> scan_operator(Iter& iter, Iter end, std::shared_ptr<std::string> s
         iter = std::next(iter);
         return make_token(TokenKind::RightBracket, first, iter, std::move(src));
     }
+    else if(*iter == '{')
+    {
+        iter = std::next(iter);
+        return make_token(TokenKind::LeftCurly, first, iter, std::move(src));
+    }
+    else if(*iter == '}')
+    {
+        iter = std::next(iter);
+        return make_token(TokenKind::RightCurly, first, iter, std::move(src));
+    }
     return err(make_error_message("scan_operator: unknown operator appeared",
         make_token(TokenKind::Invalid, iter, std::next(iter), std::move(src))));
 }
@@ -261,7 +271,7 @@ Result<Token> scan_token(Iter& iter, Iter end, std::shared_ptr<std::string> src)
     {
         return scan_identifier(iter, end, std::move(src));
     }
-    else if(is_oneof(iter, end, "+-*/()"))
+    else if(is_oneof(iter, end, "+-*/(){}"))
     {
         return scan_operator(iter, end, std::move(src));
     }
