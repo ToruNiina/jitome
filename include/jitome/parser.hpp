@@ -16,11 +16,11 @@ Result<Node> parse_expr(std::deque<Token>& tokens);
 
 inline Result<Node> parse_primary(std::deque<Token>& tokens)
 {
-    if(tokens.front().kind == TokenKind::LeftBracket)
+    if(tokens.front().kind == TokenKind::LeftParen)
     {
         tokens.pop_front();
         auto expr = parse_expr(tokens);
-        if(tokens.front().kind == TokenKind::RightBracket)
+        if(tokens.front().kind == TokenKind::RightParen)
         {
             tokens.pop_front();
             return expr;

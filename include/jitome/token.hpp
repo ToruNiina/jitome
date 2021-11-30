@@ -14,8 +14,8 @@ enum class TokenKind
     Immediate,
     Identifier,
     Operator,
-    LeftBracket,
-    RightBracket,
+    LeftParen,
+    RightParen,
     LeftCurly,
     RightCurly,
     Comma,
@@ -29,8 +29,8 @@ inline std::ostream& operator<<(std::ostream& os, TokenKind k)
         case TokenKind::Immediate   : {os << "Immediate"   ; break;}
         case TokenKind::Identifier  : {os << "Identifier"  ; break;}
         case TokenKind::Operator    : {os << "Operator"    ; break;}
-        case TokenKind::LeftBracket : {os << "LeftBracket "; break;}
-        case TokenKind::RightBracket: {os << "RightBracket"; break;}
+        case TokenKind::LeftParen   : {os << "LeftParen "  ; break;}
+        case TokenKind::RightParen  : {os << "RightParen"  ; break;}
         case TokenKind::LeftCurly   : {os << "LeftCurly "  ; break;}
         case TokenKind::RightCurly  : {os << "RightCurly"  ; break;}
         case TokenKind::Comma       : {os << "Comma"       ; break;}
@@ -46,8 +46,8 @@ inline std::string to_string(TokenKind k)
         case TokenKind::Immediate   : {return std::string("Immediate"   );}
         case TokenKind::Identifier  : {return std::string("Identifier"  );}
         case TokenKind::Operator    : {return std::string("Operator"    );}
-        case TokenKind::LeftBracket : {return std::string("LeftBracket ");}
-        case TokenKind::RightBracket: {return std::string("RightBracket");}
+        case TokenKind::LeftParen   : {return std::string("LeftParen "  );}
+        case TokenKind::RightParen  : {return std::string("RightParen"  );}
         case TokenKind::LeftCurly   : {return std::string("LeftCurly "  );}
         case TokenKind::RightCurly  : {return std::string("RightCurly"  );}
         case TokenKind::Comma       : {return std::string("Comma"       );}
