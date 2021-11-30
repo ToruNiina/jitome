@@ -2,7 +2,11 @@
 
 ident = alpha *(alpha / underscore / digit)
 
-negligible = whitespace / comment ; ws, tab, or /* ... */
+function               = function-argument-list function-body ; (a, b) {a + b}
+function-body          = curry-open *negligible expression *negligible curry-close
+function-arguments     = paren-open *negligible ?function-argument-list *negligible paren-close
+function-argument-list = function-argument *( *negligible comma *negligible function-argument )
+function-argument      = ident
 
 expression = (arithmetic / function-call / primary)
 expression =/ paren-open *negligible (arithmetic / function-call / primary) *negligible paren-close ; (x + y)
@@ -15,9 +19,9 @@ division    = expression *negligible operator-division    *negligible expression
 negation    = operator-subtraction expression
 power       = expression *negligible operator-power negligible immediate-integer
 
-function-call      = ident *negligible paren-open *negligible function-arguments *negligible paren-close
-function-arguments = function-argument *( *negligible comma *negligible function-argument )
-function-argument  = expression / primary
+function-call      = ident *negligible paren-open *negligible ?function-arguments *negligible paren-close
+function-call-arguments = function-argument *( *negligible comma *negligible function-call-argument )
+function-call-argument  = expression / primary
 
 primary = immediate / ident
 
@@ -43,6 +47,8 @@ operator-power       = %x5E ; ^
 
 paren-open  = %x28 ; (
 paren-close = %x29 ; )
+curry-open  = %x7B ; {
+curry-close = %x7D ; }
 
 ; /* comment */
 comment = comment-start-symbol *comment-content-characters comment-stop-symbol ; /* ... */
@@ -64,6 +70,8 @@ carriage-return = %09
 whitespace = *whitespace-characters
 whitespace-characters =  %x20 ; space
 whitespace-characters =/ %x09 ; tab
+
+negligible = whitespace / comment ; ws, tab, or /* ... */
 
 alpha = ALPHA ; core rules
 digit = DIGIT
