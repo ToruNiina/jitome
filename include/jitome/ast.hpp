@@ -4,11 +4,14 @@
 #include <memory>
 #include <string>
 #include <variant>
+#include <vector>
 
 namespace jitome
 {
 
 struct Node;
+bool operator==(const Node&, const Node&) noexcept;
+bool operator!=(const Node&, const Node&) noexcept;
 
 struct NodeVariable
 {
@@ -104,24 +107,24 @@ JITOME_DEFINE_BINARY_OPERATION_FUNCTION(Division,       (x/y))
         static inline double invoke(double x) noexcept     \
         {return (expr);}                                   \
     };                                                     \
-    using Node ## name = NodeExpresison<name, 1>;       /**/
+    using Node ## name = NodeExpression<name, 1>;       /**/
 
 JITOME_DEFINE_UNARY_OPERATION_FUNCTION(Negation, (-x))
 #undef JITOME_DEFINE_UNARY_OPERATION_FUNCTION
 
-struct NodeFuncDef
+struct NodeFunction
 {
     std::string              name;
     std::vector<std::string> args;
     std::unique_ptr<Node>    body;
 
-    bool operator==(const NodeImmediate& other) const noexcept
+    bool operator==(const NodeFunction& other) const noexcept
     {
         return this->args == other.args &&
             this->body != nullptr && other.body != nullptr &&
-            *(this->body)== *(other.body);
+            *(this->body) == *(other.body);
     }
-    bool operator!=(const NodeImmediate& other) const noexcept
+    bool operator!=(const NodeFunction& other) const noexcept
     {
         return !(*this == other);
     }
@@ -139,16 +142,17 @@ struct Node
         NodeNegation,
         NodeFunction
         > node;
-
-    bool operator==(const Node& other) const noexcept
-    {
-        return this->node == other.node;
-    }
-    bool operator!=(const Node& other) const noexcept
-    {
-        return this->node != other.node;
-    }
 };
+
+
+inline bool operator==(const Node& lhs, const Node& rhs) noexcept
+{
+    return lhs.node == rhs.node;
+}
+inline bool operator!=(const Node& lhs, const Node& rhs) noexcept
+{
+    return lhs.node != rhs.node;
+}
 
 template<typename T>
 std::unique_ptr<Node> make_node_ptr(T&& n)
