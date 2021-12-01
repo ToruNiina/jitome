@@ -143,10 +143,76 @@ inline Result<Node> parse_expr(std::deque<Token>& tokens)
     return lhs;
 }
 
+inline Result<Node> parse_funcdef(std::deque<Token>& tokens)
+{
+    if(tokens.empty())
+    {
+        return err("No tokens left.");
+    }
+
+    NodeFuncDef defun;
+
+    //XXX: no name here
+
+    if(tokens.front().kind != TokenKind::LeftParen)
+    {
+        return err(make_error_message("parse_funcdef: expected left paren, but found: ",
+                    tokens.front()));
+    }
+    tokens.pop_front(); // pop LeftParen
+
+    while(not tokens.empty())
+    {
+        if(tokens.front().kind != TokenKind::Identifier)
+        {
+            return err(make_error_message("parse_funcdef: expected identifier, but found: ",
+                        tokens.front()));
+        }
+
+        defun.args.append(std::string(tokens.front().str));
+        tokens.pop_front();
+    }
+    if(tokens.front().kind != TokenKind::LeftParen)
+    {
+        return err(make_error_message("parse_funcdef: expected left paren, but found: ",
+                    tokens.front()));
+    }
+    tokens.pop_front(); // pop RightParen
+
+    if(tokens.front().kind != TokenKind::LeftCurly)
+    {
+        return err(make_error_message("parse_funcdef: expected left curly brace, but found: ",
+                    tokens.front()));
+    }
+    tokens.pop_front(); // pop LeftCurly
+
+    auto expr = parse_expr(tokens);
+    if(!expr)
+    {
+        return expr;
+    }
+    defun.body = std::move(expr.as_val());
+
+    if(tokens.front().kind != TokenKind::RightCurly)
+    {
+        return err(make_error_message("parse_funcdef: expected right curly brace, but found: ",
+                    tokens.front()));
+    }
+    tokens.pop_front(); // pop RightCurly
+
+    return ok(Node(std::move(defun)));
+}
+
 inline Result<Node> parse(std::deque<Token> tokens)
 {
-    auto root = parse_expr(tokens);
-    return root;
+    if(tokens.front().kind == TokenKind::LeftParen)
+    {
+        return parse_funcdef(tokens);
+    }
+    else
+    {
+        return parse_expr(tokens);
+    }
 }
 
 } // jitome
