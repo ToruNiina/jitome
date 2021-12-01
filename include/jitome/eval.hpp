@@ -29,7 +29,7 @@ double invoke_func(std::map<std::string, double>& env, const NodeExpression<F, N
 inline double evaluate(std::map<std::string, double>& env, const Node& root)
 {
     return std::visit([&env] (const auto& node) {
-        if constexpr (is_typeof<decltype(node), NodeArgument>)
+        if constexpr (is_typeof<decltype(node), NodeVariable>)
         {
             return env.at(node.name);
         }
