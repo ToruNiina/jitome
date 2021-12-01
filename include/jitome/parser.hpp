@@ -150,7 +150,7 @@ inline Result<Node> parse_funcdef(std::deque<Token>& tokens)
         return err("No tokens left.");
     }
 
-    NodeFuncDef defun;
+    NodeFunction defun;
 
     //XXX: no name here
 
@@ -169,7 +169,7 @@ inline Result<Node> parse_funcdef(std::deque<Token>& tokens)
                         tokens.front()));
         }
 
-        defun.args.append(std::string(tokens.front().str));
+        defun.args.push_back(std::string(tokens.front().str));
         tokens.pop_front();
     }
     if(tokens.front().kind != TokenKind::LeftParen)
@@ -187,11 +187,11 @@ inline Result<Node> parse_funcdef(std::deque<Token>& tokens)
     tokens.pop_front(); // pop LeftCurly
 
     auto expr = parse_expr(tokens);
-    if(!expr)
+    if(expr.is_err())
     {
         return expr;
     }
-    defun.body = std::move(expr.as_val());
+    defun.body = std::make_unique<Node>(std::move(expr.as_val()));
 
     if(tokens.front().kind != TokenKind::RightCurly)
     {
@@ -200,7 +200,7 @@ inline Result<Node> parse_funcdef(std::deque<Token>& tokens)
     }
     tokens.pop_front(); // pop RightCurly
 
-    return ok(Node(std::move(defun)));
+    return ok(Node{std::move(defun)});
 }
 
 inline Result<Node> parse(std::deque<Token> tokens)
