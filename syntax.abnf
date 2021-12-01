@@ -2,7 +2,7 @@
 
 ident = alpha *(alpha / underscore / digit)
 
-function               = function-argument-list function-body ; (a, b) {a + b}
+function               = *negligible function-argument-list *negligible function-body ; (a, b) {a + b}
 function-body          = curly-open *negligible expression *negligible curly-close
 function-arguments     = paren-open *negligible ?function-argument-list *negligible paren-close
 function-argument-list = function-argument *( *negligible comma *negligible function-argument )
