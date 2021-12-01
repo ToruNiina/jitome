@@ -189,7 +189,7 @@ int main()
 
         boost::ut::expect(actual1.kind == jitome::TokenKind::Operator);
         boost::ut::expect(actual2.kind == jitome::TokenKind::Operator);
-        boost::ut::expect(actual3.kind == jitome::TokenKind::LeftBracket);
+        boost::ut::expect(actual3.kind == jitome::TokenKind::LeftParen);
 
         boost::ut::expect(actual1.str == "+");
         boost::ut::expect(actual2.str == "-");
@@ -252,23 +252,59 @@ int main()
 
     "tokenize"_test = []
     {
-        const auto actual = jitome::tokenize("foo+bar-1.5");
-        boost::ut::expect(actual.is_ok());
+        {
+            const auto actual = jitome::tokenize("foo+bar-1.5");
+            boost::ut::expect(actual.is_ok());
 
-        const auto actual1 = actual.as_val();
+            const auto actual1 = actual.as_val();
 
-        boost::ut::expect(actual1.size() == 5);
-        boost::ut::expect(actual1.at(0).kind == jitome::TokenKind::Identifier);
-        boost::ut::expect(actual1.at(1).kind == jitome::TokenKind::Operator);
-        boost::ut::expect(actual1.at(2).kind == jitome::TokenKind::Identifier);
-        boost::ut::expect(actual1.at(3).kind == jitome::TokenKind::Operator);
-        boost::ut::expect(actual1.at(4).kind == jitome::TokenKind::Immediate);
+            boost::ut::expect(actual1.size() == 5);
+            boost::ut::expect(actual1.at(0).kind == jitome::TokenKind::Identifier);
+            boost::ut::expect(actual1.at(1).kind == jitome::TokenKind::Operator);
+            boost::ut::expect(actual1.at(2).kind == jitome::TokenKind::Identifier);
+            boost::ut::expect(actual1.at(3).kind == jitome::TokenKind::Operator);
+            boost::ut::expect(actual1.at(4).kind == jitome::TokenKind::Immediate);
 
-        boost::ut::expect(actual1.at(0).str == "foo");
-        boost::ut::expect(actual1.at(1).str == "+");
-        boost::ut::expect(actual1.at(2).str == "bar");
-        boost::ut::expect(actual1.at(3).str == "-");
-        boost::ut::expect(actual1.at(4).str == "1.5");
+            boost::ut::expect(actual1.at(0).str == "foo");
+            boost::ut::expect(actual1.at(1).str == "+");
+            boost::ut::expect(actual1.at(2).str == "bar");
+            boost::ut::expect(actual1.at(3).str == "-");
+            boost::ut::expect(actual1.at(4).str == "1.5");
+        }
+
+        {
+            const auto actual = jitome::tokenize("(foo, bar) {foo * 2 + bar}");
+            boost::ut::expect(actual.is_ok());
+
+            const auto actual1 = actual.as_val();
+
+            boost::ut::expect(actual1.size() == 12);
+            boost::ut::expect(actual1.at( 0).kind == jitome::TokenKind::LeftParen);
+            boost::ut::expect(actual1.at( 1).kind == jitome::TokenKind::Identifier);
+            boost::ut::expect(actual1.at( 2).kind == jitome::TokenKind::Comma);
+            boost::ut::expect(actual1.at( 3).kind == jitome::TokenKind::Identifier);
+            boost::ut::expect(actual1.at( 4).kind == jitome::TokenKind::RightParen);
+            boost::ut::expect(actual1.at( 5).kind == jitome::TokenKind::LeftCurly);
+            boost::ut::expect(actual1.at( 6).kind == jitome::TokenKind::Identifier);
+            boost::ut::expect(actual1.at( 7).kind == jitome::TokenKind::Operator);
+            boost::ut::expect(actual1.at( 8).kind == jitome::TokenKind::Immediate);
+            boost::ut::expect(actual1.at( 9).kind == jitome::TokenKind::Operator);
+            boost::ut::expect(actual1.at(10).kind == jitome::TokenKind::Identifier);
+            boost::ut::expect(actual1.at(11).kind == jitome::TokenKind::RightCurly);
+
+            boost::ut::expect(actual1.at( 0).str == "("  );
+            boost::ut::expect(actual1.at( 1).str == "foo");
+            boost::ut::expect(actual1.at( 2).str == ","  );
+            boost::ut::expect(actual1.at( 3).str == "bar");
+            boost::ut::expect(actual1.at( 4).str == ")"  );
+            boost::ut::expect(actual1.at( 5).str == "{"  );
+            boost::ut::expect(actual1.at( 6).str == "foo");
+            boost::ut::expect(actual1.at( 7).str == "*"  );
+            boost::ut::expect(actual1.at( 8).str == "2"  );
+            boost::ut::expect(actual1.at( 9).str == "+"  );
+            boost::ut::expect(actual1.at(10).str == "bar");
+            boost::ut::expect(actual1.at(11).str == "}"  );
+        }
     };
 
     return 0;
