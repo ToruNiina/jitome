@@ -49,6 +49,12 @@ inline Result<Node> parse_primary(std::deque<Token>& tokens)
         tokens.pop_front();
         return ok(Node{NodeImmediate{imm}});
     }
+    else if(tokens.front().kind == TokenKind::Identifier)
+    {
+        std::string ident(tokens.front().str);
+        tokens.pop_front();
+        return ok(Node{NodeVariable{std::move(ident)}});
+    }
     return err(make_error_message("parse_primary: unexpected token appeared",
                                   tokens.front()));
 }
