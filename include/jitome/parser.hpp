@@ -161,23 +161,41 @@ inline Result<Node> parse_funcdef(std::deque<Token>& tokens)
     }
     tokens.pop_front(); // pop LeftParen
 
+    bool is_first = true;
     while(not tokens.empty())
     {
+        if(!is_first)
+        {
+            if(tokens.front().kind != TokenKind::Comma)
+            {
+                return err(make_error_message("parse_funcdef: expected comma, but found: ",
+                           tokens.front()));
+            }
+            else
+            {
+                tokens.pop_front(); // comma
+            }
+        }
         if(tokens.front().kind != TokenKind::Identifier)
         {
             return err(make_error_message("parse_funcdef: expected identifier, but found: ",
-                        tokens.front()));
+                       tokens.front()));
         }
 
         defun.args.push_back(std::string(tokens.front().str));
         tokens.pop_front();
+        is_first = false;
+
+        if(tokens.front().kind == TokenKind::RightParen)
+        {
+            tokens.pop_front();
+            break;
+        }
     }
-    if(tokens.front().kind != TokenKind::LeftParen)
+    if(tokens.empty())
     {
-        return err(make_error_message("parse_funcdef: expected left paren, but found: ",
-                    tokens.front()));
+        return err("parse_funcdef: expected right paren, but no tokens left");
     }
-    tokens.pop_front(); // pop RightParen
 
     if(tokens.front().kind != TokenKind::LeftCurly)
     {
