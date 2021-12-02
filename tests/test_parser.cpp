@@ -90,4 +90,37 @@ int main()
         boost::ut::expect(expect == actual.as_val());
 
     };
+
+    "func"_test = []
+    {
+        jitome::Node expect{
+            jitome::NodeFunction{
+                std::string(""),
+                std::vector<std::string>{std::string("a"), std::string("b")},
+                std::make_unique<jitome::Node>(jitome::Node{jitome::NodeMultiplication{
+                        jitome::NodeVariable{"a"},
+                        jitome::NodeAddition{
+                            jitome::NodeVariable{"b"},
+                            jitome::NodeImmediate{2.71}
+                        }
+                    }
+                })
+            }
+        };
+        auto tks = jitome::tokenize("(a, b){a * (b + 3)}");
+        boost::ut::expect(tks.is_ok());
+        if(tks.is_err())
+        {
+            std::cout << tks.as_err().msg << std::endl;
+        }
+        auto actual = jitome::parse(std::move(tks.as_val()));
+        boost::ut::expect(actual.is_ok());
+        if(actual.is_err())
+        {
+            std::cout << actual.as_err().msg << std::endl;
+        }
+
+        boost::ut::expect(expect == actual.as_val());
+
+    };
 }
