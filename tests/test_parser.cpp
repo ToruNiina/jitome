@@ -101,7 +101,7 @@ int main()
                         jitome::NodeVariable{"a"},
                         jitome::NodeAddition{
                             jitome::NodeVariable{"b"},
-                            jitome::NodeImmediate{2.71}
+                            jitome::NodeImmediate{3.0}
                         }
                     }
                 })
@@ -121,6 +121,9 @@ int main()
         }
 
         boost::ut::expect(expect == actual.as_val());
-
+        if(expect != actual.as_val())
+        {
+            std::cout << jitome::dump(actual.as_val()) << std::endl;
+        }
     };
 }
