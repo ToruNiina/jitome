@@ -160,6 +160,8 @@ inline Result<Node> parse_funcdef(std::deque<Token>& tokens)
 
     //XXX: no name here
 
+    // parse (a, b)
+
     if(tokens.front().kind != TokenKind::LeftParen)
     {
         return err(make_error_message("parse_funcdef: expected left paren, but found: ",
@@ -202,6 +204,8 @@ inline Result<Node> parse_funcdef(std::deque<Token>& tokens)
     {
         return err("parse_funcdef: expected right paren, but no tokens left");
     }
+
+    // parse {expr}
 
     if(tokens.front().kind != TokenKind::LeftCurly)
     {
