@@ -41,6 +41,10 @@ inline double evaluate(std::map<std::string, double>& env, const Node& root)
         {
             return invoke_func(env, node);
         }
+        else if constexpr (is_typeof<decltype(node), NodeFunction>)
+        {
+            return evaluate(env, *node.body);
+        }
         else
         {
             return std::numeric_limits<double>::quiet_NaN();
