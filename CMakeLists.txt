@@ -13,5 +13,7 @@ include_directories(${PROJECT_SOURCE_DIR}/extlib/xbyak/xbyak)
 execute_process(COMMAND git submodule update --init --recursive
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+# add_definitions("-Wfatal-errors")
+
 add_subdirectory(src)
 add_subdirectory(tests)

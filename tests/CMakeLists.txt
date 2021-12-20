@@ -3,6 +3,7 @@ set(TEST_NAMES
     test_result
     test_tokenizer
     test_parser
+    test_interpreter
     )
 
 foreach(TEST_NAME ${TEST_NAMES})
