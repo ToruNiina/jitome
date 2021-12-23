@@ -23,14 +23,14 @@ int main()
             }
         };
 
-        jitome::JitCompiler<double, double, double> add(std::move(root));
+        jitome::JitCompiler<double(double, double)> add(std::move(root));
 
         boost::ut::expect(3.14 + 2.71 == add(3.14, 2.71));
     };
 
     "add1"_test = []
     {
-        jitome::JitCompiler<double, double, double> add("(a, b) {a + b}");
+        jitome::JitCompiler<double(double, double)> add("(a, b) {a + b}");
 
         boost::ut::expect(3.14 + 2.71 == add(3.14, 2.71));
     };
@@ -51,8 +51,14 @@ int main()
             }
         };
 
-        jitome::JitCompiler<double, double, double, double> dep(std::move(root));
+        jitome::JitCompiler<double(double, double, double)> dep(std::move(root));
 
+        boost::ut::expect(2.0 * (3.14 + 2.71) == dep(2.0, 3.14, 2.71));
+    };
+
+    "dep1"_test = []
+    {
+        jitome::JitCompiler<double(double, double, double)> dep("(a, b, c) {a * (c + b)}");
         boost::ut::expect(2.0 * (3.14 + 2.71) == dep(2.0, 3.14, 2.71));
     };
 }
