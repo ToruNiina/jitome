@@ -1,6 +1,8 @@
 #ifndef JITOME_JIT_HPP
 #define JITOME_JIT_HPP
 #include "ast.hpp"
+#include "parser.hpp"
+#include "tokenizer.hpp"
 #include "util.hpp"
 #include "xbyak.h"
 
@@ -25,6 +27,22 @@ struct JitCompiler : public Xbyak::CodeGenerator
     using func_ptr = Ret (*)(Args...);
 
   public:
+
+    JitCompiler(std::string code)
+        : f_(nullptr)
+    {
+        auto tks = tokenize(code);
+        if(tks.is_err())
+        {
+            throw std::runtime_error(tks.as_err().msg);
+        }
+        auto prs = parse(tks.as_val());
+        if(prs.is_err())
+        {
+            throw std::runtime_error(prs.as_err().msg);
+        }
+        this->compile(std::move(prs.as_val()));
+    }
 
     JitCompiler(Node root)
         : f_(nullptr)
