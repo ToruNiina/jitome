@@ -28,6 +28,13 @@ int main()
         boost::ut::expect(3.14 + 2.71 == add(3.14, 2.71));
     };
 
+    "add1"_test = []
+    {
+        jitome::JitCompiler<double, double, double> add("(a, b) {a + b}");
+
+        boost::ut::expect(3.14 + 2.71 == add(3.14, 2.71));
+    };
+
     "dep"_test = []
     {
         jitome::Node root{
