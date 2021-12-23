@@ -4,6 +4,7 @@ set(TEST_NAMES
     test_tokenizer
     test_parser
     test_interpreter
+    test_jit
     )
 
 foreach(TEST_NAME ${TEST_NAMES})
