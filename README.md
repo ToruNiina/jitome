@@ -9,8 +9,7 @@ JIT-Optimized Math Expression
 
 int main()
 {
-//                      return  arg1    arg2    arg3
-    jitome::JitCompiler<double, double, double, double> func("(a, b, c) {a + b * c}");
+    jitome::JitCompiler<double(double, double, double)> func("(a, b, c) {a + b * c}");
 
     std::cout << func(1.0, 2.0, 3.0) << std::endl; // prints 7
 
