@@ -19,12 +19,12 @@
 namespace jitome
 {
 
-template<typename Ret, typename ... Args>
+template<typename F>
 struct JitCompiler : public Xbyak::CodeGenerator
 {
   public:
 
-    using func_ptr = Ret (*)(Args...);
+    using func_ptr = F*;
 
   public:
 
@@ -50,10 +50,14 @@ struct JitCompiler : public Xbyak::CodeGenerator
         this->compile(std::move(root));
     }
 
-    Ret operator()(Args... arguments)
+    operator func_ptr() const noexcept
     {
-        assert(f_ != nullptr);
-        return f_(arguments...);
+        return f_;
+    }
+
+    func_ptr get_func_ptr() const noexcept
+    {
+        return f_;
     }
 
   private:
