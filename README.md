@@ -1,6 +1,6 @@
 # jitome
 
-JIT-Optimized Math Expression
+**JIT**-**O**ptimized **M**ath **E**xpression
 
 ## Example
 
@@ -9,7 +9,9 @@ JIT-Optimized Math Expression
 
 int main()
 {
-    jitome::JitCompiler<double(double, double, double)> func("(a, b, c) {a + b * c}");
+    std::string func_body = "(a, b, c) {a + b * c}";
+
+    jitome::JitCompiler<double(double, double, double)> func(func_body);
 
     std::cout << func(1.0, 2.0, 3.0) << std::endl; // prints 7
 
@@ -22,6 +24,10 @@ int main()
 - x64 Linux
 - C++17
 - [Xbyak](https://github.com/herumi/xbyak)
+
+## Syntax
+
+See [syntax.abnf](syntax.abnf).
 
 ## Licensing terms
 
