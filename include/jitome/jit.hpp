@@ -6,6 +6,7 @@
 #include "util.hpp"
 #include "xbyak.h"
 
+#include <string_view>
 #include <cassert>
 
 #ifdef XBYAK32
@@ -87,7 +88,7 @@ struct JitCompiler : public Xbyak::CodeGenerator
         int stk = static_cast<int>(narg.size());
         std::visit([&stk, &narg, this](const auto& n) {
                 return this->expand_recursively(stk, narg, n);
-            }, func.body->node);
+            }, func.body.get().node);
 
         stk -= 1;
         movsd(xmm0, Xbyak::Xmm(stk));
@@ -120,46 +121,55 @@ struct JitCompiler : public Xbyak::CodeGenerator
             movsd(Xbyak::Xmm(stk), ptr[rsp]);
             stk += 1;
         }
-        else if constexpr (is_expr_node_v<T>)
+        else if constexpr (is_typeof<T, NodeExpression>)
         {
-            if constexpr(T::size == 1)
+            using namespace std::literals::string_view_literals;
+
+            if (node.operands.size() == 1)
             {
                 std::visit([&stk, &narg, this](const auto& n) {
                         return this->expand_recursively(stk, narg, n);
-                    }, node.operands[0]->node);
+                    }, node.operands[0].node);
                 stk -= 1;
                 movsd(xmm15, Xbyak::Xmm(stk));
             }
             else
             {
+                if(node.operands.size() != 2)
+                {
+                    throw std::runtime_error("jitome::jit: invalid number of operands in binary operator");
+                }
+
                 std::visit([&stk, &narg, this](const auto& n) {
                         return this->expand_recursively(stk, narg, n);
-                    }, node.operands[0]->node);
+                    }, node.operands[0].node);
                 std::visit([&stk, &narg, this](const auto& n) {
                         return this->expand_recursively(stk, narg, n);
-                    }, node.operands[1]->node);
+                    }, node.operands[1].node);
+
                 stk -= 1;
                 movsd(xmm15, Xbyak::Xmm(stk));
                 stk -= 1;
                 movsd(xmm14, Xbyak::Xmm(stk));
             }
-            if constexpr (std::is_same_v<T, NodeExpression<Addition, 2>>)
+
+            if (node.function == "+"sv)
             {
                 addsd(xmm15, xmm14);
             }
-            else if constexpr (std::is_same_v<T, NodeExpression<Subtraction, 2>>)
+            else if (node.function == "-"sv && node.operands.size() == 2)
             {
                 subsd(xmm15, xmm14);
             }
-            else if constexpr (std::is_same_v<T, NodeExpression<Multiplication, 2>>)
+            else if (node.function == "*"sv)
             {
                 mulsd(xmm15, xmm14);
             }
-            else if constexpr (std::is_same_v<T, NodeExpression<Division, 2>>)
+            else if (node.function == "/"sv)
             {
                 divsd(xmm15, xmm14);
             }
-            else if constexpr (std::is_same_v<T, NodeExpression<Negation, 1>>)
+            else if (node.function == "-"sv && node.operands.size() == 1)
             {
                 movsd(xmm14, xmm15);
                 pxor (xmm15, xmm15);
