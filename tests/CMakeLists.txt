@@ -1,8 +1,8 @@
 set(TEST_NAMES
-    test_eval
     test_result
     test_tokenizer
     test_parser
+    test_eval
     test_interpreter
     test_jit
     )
