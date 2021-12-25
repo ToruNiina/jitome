@@ -98,14 +98,15 @@ int main()
             jitome::NodeFunction{
                 std::string(""),
                 std::vector<std::string>{std::string("a"), std::string("b")},
-                std::make_unique<jitome::Node>(jitome::Node{jitome::NodeExpression{"*",
+                jitome::Node{
+                    jitome::NodeExpression{"*",
                         jitome::NodeVariable{"a"},
                         jitome::NodeExpression{"+"sv,
                             jitome::NodeVariable{"b"},
                             jitome::NodeImmediate{3.0}
                         }
                     }
-                })
+                }
             }
         };
         auto tks = jitome::tokenize("(a, b){a * (b + 3)}");
