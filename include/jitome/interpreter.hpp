@@ -44,28 +44,7 @@ struct Interpreter
             env[func.args.at(i)] = args.at(i);
         }
 
-        return std::visit([&env] (const auto& node) -> double {
-            if constexpr (is_typeof<decltype(node), NodeVariable>)
-            {
-                return env.at(node.name);
-            }
-            else if constexpr (is_typeof<decltype(node), NodeImmediate>)
-            {
-                return node.value;
-            }
-            else if constexpr (is_expr_node_v<decltype(node)>)
-            {
-                return invoke_func(env, node);
-            }
-            else if constexpr (is_typeof<decltype(node), NodeFunction>)
-            {
-                return evaluate(env, *node.body);
-            }
-            else
-            {
-                throw std::runtime_error("unknown node appeared");
-            }
-        }, func_.node);
+        return evaluate(env, func.body);
     }
 
   private:

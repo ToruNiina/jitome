@@ -13,17 +13,55 @@ namespace jitome
 
 double evaluate(std::map<std::string, double>& env, const Node& root);
 
-template<typename F, std::size_t N, std::size_t ... Is>
-double invoke_func_impl(std::map<std::string, double>& env,
-        const NodeExpression<F, N>& node, std::index_sequence<Is...>)
+inline double invoke_func(std::map<std::string, double>& env, const NodeExpression& node)
 {
-    return F::invoke(evaluate(env, *std::get<Is>(node.operands))...);
-}
-
-template<typename F, std::size_t N>
-double invoke_func(std::map<std::string, double>& env, const NodeExpression<F, N>& node)
-{
-    return invoke_func_impl(env, node, std::make_index_sequence<N>{});
+    using namespace std::literals::string_view_literals;
+    if(node.function == "+"sv)
+    {
+        if(node.operands.size() != 2)
+        {
+            throw std::runtime_error("jitome::evaluate: invalid number of operands in `+`");
+        }
+        return evaluate(env, node.operands.at(0)) + evaluate(env, node.operands.at(1));
+    }
+    else if(node.function == "-"sv)
+    {
+        if(node.operands.size() == 1)
+        {
+            return -evaluate(env, node.operands.at(0));
+        }
+        else
+        {
+            if(node.operands.size() != 2)
+            {
+                throw std::runtime_error("jitome::evaluate: invalid number of operands in `-`");
+            }
+            return evaluate(env, node.operands.at(0)) -
+                   evaluate(env, node.operands.at(1));
+        }
+    }
+    else if(node.function == "*"sv)
+    {
+        if(node.operands.size() != 2)
+        {
+            throw std::runtime_error("jitome::evaluate: invalid number of operands in `*`");
+        }
+        return evaluate(env, node.operands.at(0)) *
+               evaluate(env, node.operands.at(1));
+    }
+    else if(node.function == "/"sv)
+    {
+        if(node.operands.size() != 2)
+        {
+            throw std::runtime_error("jitome::evaluate: invalid number of operands in `/`");
+        }
+        return evaluate(env, node.operands.at(0)) /
+               evaluate(env, node.operands.at(1));
+    }
+    else
+    {
+        throw std::runtime_error("jitome::evaluate: unknown function name: " + std::string(node.function));
+    }
 }
 
 inline double evaluate(std::map<std::string, double>& env, const Node& root)
@@ -37,13 +75,13 @@ inline double evaluate(std::map<std::string, double>& env, const Node& root)
         {
             return node.value;
         }
-        else if constexpr (is_expr_node_v<decltype(node)>)
+        else if constexpr (is_typeof<decltype(node), NodeExpression>)
         {
             return invoke_func(env, node);
         }
         else if constexpr (is_typeof<decltype(node), NodeFunction>)
         {
-            return evaluate(env, *node.body);
+            return evaluate(env, node.body);
         }
         else
         {
