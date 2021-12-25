@@ -61,6 +61,7 @@ inline Result<Node> parse_primary(std::deque<Token>& tokens)
 
 inline Result<Node> parse_mul(std::deque<Token>& tokens)
 {
+    using namespace std::literals::string_view_literals;
     auto lhs = parse_primary(tokens);
 
     if(lhs.is_err())
@@ -79,7 +80,7 @@ inline Result<Node> parse_mul(std::deque<Token>& tokens)
                 return rhs;
             }
 
-            lhs = Node{NodeMultiplication{
+            lhs = Node{NodeExpression{"*"sv,
                 std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
@@ -92,7 +93,7 @@ inline Result<Node> parse_mul(std::deque<Token>& tokens)
                 return rhs;
             }
 
-            lhs = Node{NodeDivision{
+            lhs = Node{NodeExpression{"/"sv,
                 std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
@@ -106,6 +107,7 @@ inline Result<Node> parse_mul(std::deque<Token>& tokens)
 
 inline Result<Node> parse_expr(std::deque<Token>& tokens)
 {
+    using namespace std::literals::string_view_literals;
     auto lhs = parse_mul(tokens);
 
     if(lhs.is_err())
@@ -124,7 +126,7 @@ inline Result<Node> parse_expr(std::deque<Token>& tokens)
                 return rhs;
             }
 
-            lhs = Node{NodeAddition{
+            lhs = Node{NodeExpression{"+"sv,
                 std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
@@ -137,7 +139,7 @@ inline Result<Node> parse_expr(std::deque<Token>& tokens)
                 return rhs;
             }
 
-            lhs = Node{NodeSubtraction{
+            lhs = Node{NodeExpression{"-"sv,
                 std::move(lhs.as_val()), std::move(rhs.as_val())
             }};
         }
