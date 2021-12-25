@@ -1,6 +1,7 @@
 #ifndef JITOME_UTIL_HPP
 #define JITOME_UTIL_HPP
 #include <memory>
+#include <stdexcept>
 #include <type_traits>
 #include <cstring>
 
