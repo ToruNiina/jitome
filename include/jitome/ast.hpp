@@ -52,19 +52,18 @@ inline std::string dump(const NodeImmediate& node)
 
 struct NodeExpression
 {
-    static constexpr inline std::size_t size = N;
-
     std::string_view  function; // or enum?
     std::vector<Node> operands;
 
-    NodeExpression(Ts&&... args)
-        : operands{std::forward<Ts>(args)...}
+    template<typename ... Ts>
+    NodeExpression(std::string_view f, Ts&&... args)
+        : function(f), operands{Node{std::forward<Ts>(args)}...}
     {}
 
     bool operator==(const NodeExpression& other) const noexcept
     {
         return (this->function == other.function) &&
-               (this->operands == other.operands)
+               (this->operands == other.operands);
     }
     bool operator!=(const NodeExpression& other) const noexcept
     {
@@ -72,8 +71,7 @@ struct NodeExpression
     }
 };
 
-template<typename Func, std::size_t N>
-inline std::string dump(const NodeExpression<Func, N>& node)
+inline std::string dump(const NodeExpression& node)
 {
     std::string retval("Expr{");
     retval += node.function;
