@@ -1,6 +1,7 @@
 #ifndef JITOME_AST_HPP
 #define JITOME_AST_HPP
 #include "traits.hpp"
+#include "util.hpp"
 #include <memory>
 #include <string>
 #include <variant>
@@ -89,15 +90,15 @@ inline std::string dump(const NodeExpression& node)
 
 struct NodeFunction
 {
-    std::string              name;
-    std::vector<std::string> args;
-    std::unique_ptr<Node>    body;
+    std::string                    name;
+    std::vector<std::string>       args;
+    copyable_dynamic_storage<Node> body;
 
     bool operator==(const NodeFunction& other) const noexcept
     {
-        return this->args == other.args &&
-            this->body != nullptr && other.body != nullptr &&
-            *(this->body) == *(other.body);
+        return this->name == other.name &&
+               this->args == other.args &&
+               this->body == other.body ;
     }
     bool operator!=(const NodeFunction& other) const noexcept
     {
@@ -118,7 +119,7 @@ inline std::string dump(const NodeFunction& node)
         front = false;
     }
     retval += ") {";
-    retval += dump(*node.body);
+    retval += dump(node.body);
     retval += "}";
     return retval;
 }
