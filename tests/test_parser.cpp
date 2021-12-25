@@ -7,11 +7,12 @@
 int main()
 {
     using namespace boost::ut::literals;
+    using namespace std::literals::string_view_literals;
 
     "add"_test = []
     {
         jitome::Node expect{
-            jitome::NodeAddition{
+            jitome::NodeExpression{"+"sv,
                 jitome::NodeImmediate{3.14},
                 jitome::NodeImmediate{2.71}
             }
@@ -37,8 +38,8 @@ int main()
     "add"_test = []
     {
         jitome::Node expect{
-            jitome::NodeAddition{
-                jitome::Node{jitome::NodeAddition{
+            jitome::NodeExpression{"+"sv,
+                jitome::Node{jitome::NodeExpression{"+"sv,
                         jitome::NodeImmediate{1.00},
                         jitome::NodeImmediate{3.14}
                     }},
@@ -66,9 +67,9 @@ int main()
     "dep"_test = []
     {
         jitome::Node expect{
-            jitome::NodeMultiplication{
+            jitome::NodeExpression{"*"sv,
                 jitome::NodeImmediate{2.0},
-                jitome::NodeAddition{
+                jitome::NodeExpression{"+"sv,
                     jitome::NodeImmediate{3.14},
                     jitome::NodeImmediate{2.71}
                 }
@@ -97,9 +98,9 @@ int main()
             jitome::NodeFunction{
                 std::string(""),
                 std::vector<std::string>{std::string("a"), std::string("b")},
-                std::make_unique<jitome::Node>(jitome::Node{jitome::NodeMultiplication{
+                std::make_unique<jitome::Node>(jitome::Node{jitome::NodeExpression{"*",
                         jitome::NodeVariable{"a"},
-                        jitome::NodeAddition{
+                        jitome::NodeExpression{"+"sv,
                             jitome::NodeVariable{"b"},
                             jitome::NodeImmediate{3.0}
                         }
