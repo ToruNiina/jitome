@@ -221,7 +221,7 @@ inline Result<Node> parse_funcdef(std::deque<Token>& tokens)
     {
         return expr;
     }
-    defun.body = std::make_unique<Node>(std::move(expr.as_val()));
+    defun.body = std::move(expr.as_val());
 
     if(tokens.front().kind != TokenKind::RightCurly)
     {
