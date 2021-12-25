@@ -66,7 +66,7 @@ struct copyable_dynamic_storage
         }
         return *storage_;
     }
-    value_type& get(std::nothrow_t&) const
+    value_type& get(const std::nothrow_t&) const
     {
         return *storage_;
     }
