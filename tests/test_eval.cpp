@@ -6,11 +6,12 @@
 int main()
 {
     using namespace boost::ut::literals;
+    using namespace std::literals::string_view_literals;
 
     "add"_test = []
     {
         jitome::Node root{
-            jitome::NodeAddition{
+            jitome::NodeExpression{"+"sv,
                 jitome::NodeImmediate{3.14},
                 jitome::NodeImmediate{2.71}
             }
@@ -23,9 +24,9 @@ int main()
     "dep"_test = []
     {
         jitome::Node root{
-            jitome::NodeMultiplication{
+            jitome::NodeExpression{"*"sv,
                 jitome::NodeImmediate{2.0},
-                jitome::NodeAddition{
+                jitome::NodeExpression{"+"sv,
                     jitome::NodeImmediate{3.14},
                     jitome::NodeImmediate{2.71}
                 }

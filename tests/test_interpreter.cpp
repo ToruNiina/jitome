@@ -8,6 +8,7 @@ int main()
 {
     using namespace boost::ut::literals;
     using namespace std::literals::string_literals;
+    using namespace std::literals::string_view_literals;
 
     "add"_test = []
     {
@@ -15,11 +16,10 @@ int main()
             jitome::NodeFunction{
                 "add",
                 std::vector{"a"s, "b"s},
-                jitome::make_node_ptr(jitome::NodeAddition{
-                        jitome::NodeVariable{"a"},
-                        jitome::NodeVariable{"b"}
-                    }
-                )
+                jitome::Node{jitome::NodeExpression{"+"sv,
+                    jitome::NodeVariable{"a"},
+                    jitome::NodeVariable{"b"}
+                }}
             }
         };
 
@@ -34,13 +34,13 @@ int main()
             jitome::NodeFunction{
                 "dep",
                 std::vector{"a"s, "b"s, "c"s},
-                jitome::make_node_ptr(jitome::NodeMultiplication{
+                jitome::Node{jitome::NodeExpression{"*"sv,
                     jitome::NodeVariable{"a"},
-                    jitome::NodeAddition{
+                    jitome::NodeExpression{"+"sv,
                         jitome::NodeVariable{"b"},
                         jitome::NodeVariable{"c"},
                     }
-                })
+                }}
             }
         };
 
