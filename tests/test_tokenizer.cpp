@@ -273,24 +273,25 @@ int main()
         }
 
         {
-            const auto actual = jitome::tokenize("(foo, bar) {foo * 2 + bar}");
+            const auto actual = jitome::tokenize("(foo, bar) {return foo * 2 + bar}");
             boost::ut::expect(actual.is_ok());
 
             const auto actual1 = actual.as_val();
 
-            boost::ut::expect(actual1.size() == 12);
+            boost::ut::expect(actual1.size() == 13);
             boost::ut::expect(actual1.at( 0).kind == jitome::TokenKind::LeftParen);
             boost::ut::expect(actual1.at( 1).kind == jitome::TokenKind::Identifier);
             boost::ut::expect(actual1.at( 2).kind == jitome::TokenKind::Comma);
             boost::ut::expect(actual1.at( 3).kind == jitome::TokenKind::Identifier);
             boost::ut::expect(actual1.at( 4).kind == jitome::TokenKind::RightParen);
             boost::ut::expect(actual1.at( 5).kind == jitome::TokenKind::LeftCurly);
-            boost::ut::expect(actual1.at( 6).kind == jitome::TokenKind::Identifier);
-            boost::ut::expect(actual1.at( 7).kind == jitome::TokenKind::Operator);
-            boost::ut::expect(actual1.at( 8).kind == jitome::TokenKind::Immediate);
-            boost::ut::expect(actual1.at( 9).kind == jitome::TokenKind::Operator);
-            boost::ut::expect(actual1.at(10).kind == jitome::TokenKind::Identifier);
-            boost::ut::expect(actual1.at(11).kind == jitome::TokenKind::RightCurly);
+            boost::ut::expect(actual1.at( 6).kind == jitome::TokenKind::Keyword);
+            boost::ut::expect(actual1.at( 7).kind == jitome::TokenKind::Identifier);
+            boost::ut::expect(actual1.at( 8).kind == jitome::TokenKind::Operator);
+            boost::ut::expect(actual1.at( 9).kind == jitome::TokenKind::Immediate);
+            boost::ut::expect(actual1.at(10).kind == jitome::TokenKind::Operator);
+            boost::ut::expect(actual1.at(11).kind == jitome::TokenKind::Identifier);
+            boost::ut::expect(actual1.at(12).kind == jitome::TokenKind::RightCurly);
 
             boost::ut::expect(actual1.at( 0).str == "("  );
             boost::ut::expect(actual1.at( 1).str == "foo");
@@ -298,12 +299,13 @@ int main()
             boost::ut::expect(actual1.at( 3).str == "bar");
             boost::ut::expect(actual1.at( 4).str == ")"  );
             boost::ut::expect(actual1.at( 5).str == "{"  );
-            boost::ut::expect(actual1.at( 6).str == "foo");
-            boost::ut::expect(actual1.at( 7).str == "*"  );
-            boost::ut::expect(actual1.at( 8).str == "2"  );
-            boost::ut::expect(actual1.at( 9).str == "+"  );
-            boost::ut::expect(actual1.at(10).str == "bar");
-            boost::ut::expect(actual1.at(11).str == "}"  );
+            boost::ut::expect(actual1.at( 6).str == "return");
+            boost::ut::expect(actual1.at( 7).str == "foo");
+            boost::ut::expect(actual1.at( 8).str == "*"  );
+            boost::ut::expect(actual1.at( 9).str == "2"  );
+            boost::ut::expect(actual1.at(10).str == "+"  );
+            boost::ut::expect(actual1.at(11).str == "bar");
+            boost::ut::expect(actual1.at(12).str == "}"  );
         }
     };
 
