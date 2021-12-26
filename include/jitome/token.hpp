@@ -13,6 +13,7 @@ enum class TokenKind
 {
     Immediate,
     Identifier,
+    Keyword,
     Operator,
     LeftParen,
     RightParen,
@@ -28,6 +29,7 @@ inline std::ostream& operator<<(std::ostream& os, TokenKind k)
     {
         case TokenKind::Immediate   : {os << "Immediate"   ; break;}
         case TokenKind::Identifier  : {os << "Identifier"  ; break;}
+        case TokenKind::Keyword     : {os << "Keyword"     ; break;}
         case TokenKind::Operator    : {os << "Operator"    ; break;}
         case TokenKind::LeftParen   : {os << "LeftParen "  ; break;}
         case TokenKind::RightParen  : {os << "RightParen"  ; break;}
@@ -45,6 +47,7 @@ inline std::string to_string(TokenKind k)
     {
         case TokenKind::Immediate   : {return std::string("Immediate"   );}
         case TokenKind::Identifier  : {return std::string("Identifier"  );}
+        case TokenKind::Keyword     : {return std::string("Keyword"     );}
         case TokenKind::Operator    : {return std::string("Operator"    );}
         case TokenKind::LeftParen   : {return std::string("LeftParen "  );}
         case TokenKind::RightParen  : {return std::string("RightParen"  );}
