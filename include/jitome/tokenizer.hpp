@@ -274,6 +274,12 @@ Result<Token> scan_token(Iter& iter, Iter end, std::shared_ptr<std::string> src)
     }
     else if(std::isalpha(*iter))
     {
+        if(is_chars(iter, end, "return ") || is_chars(iter, end, "return\t"))
+        {
+            const auto first = iter;
+            iter = std::next(iter, 6);
+            return make_token(TokenKind::Keyword, first, iter, std::move(src));
+        }
         return scan_identifier(iter, end, std::move(src));
     }
     else if(is_oneof(iter, end, "+-*/(){},"))
