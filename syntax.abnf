@@ -2,11 +2,13 @@
 
 ident = alpha *(alpha / underscore / digit)
 
-function               = *negligible function-argument-list *negligible function-body ; (a, b) {a + b}
-function-body          = curly-open *negligible expression *negligible curly-close
+function               = *negligible function-argument-list *negligible curly-open *negligible function-body *negligible curly-close ; (a, b) {a + b}
+function-body          = *( statement ) return expression semicolon
 function-arguments     = paren-open *negligible ?function-argument-list *negligible paren-close
 function-argument-list = function-argument *( *negligible comma *negligible function-argument )
 function-argument      = ident
+
+statement = [ ident *negligible operator-assign ] *negligible expression *negligible semicolon ; `a = 1+2` or `1+2`
 
 expression = (arithmetic / function-call / primary)
 expression =/ paren-open *negligible (arithmetic / function-call / primary) *negligible paren-close ; (x + y)
@@ -44,6 +46,7 @@ operator-addition    = %x2B ; +
 operator-subtraction = %x2D ; -
 operator-division    = %x2F ; /
 operator-power       = %x5E ; ^
+operator-assign      = %x3D ; =
 
 paren-open  = %x28 ; (
 paren-close = %x29 ; )
@@ -77,6 +80,7 @@ alpha = ALPHA ; core rules
 digit = DIGIT
 underscore = %x5F ; _
 comma = %x2C
+semicolon = %x3B
 non-zero-digit = %x31-39
 zero  = %x30
 space = %x20
