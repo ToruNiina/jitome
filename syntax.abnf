@@ -3,7 +3,7 @@
 ident = alpha *(alpha / underscore / digit)
 
 function               = *negligible function-argument-list *negligible curly-open *negligible function-body *negligible curly-close ; (a, b) {a + b}
-function-body          = *( statement ) return expression semicolon
+function-body          = *( statement *negligible ) return whitespace *negligible expression *negligible semicolon
 function-arguments     = paren-open *negligible ?function-argument-list *negligible paren-close
 function-argument-list = function-argument *( *negligible comma *negligible function-argument )
 function-argument      = ident
