@@ -28,7 +28,7 @@ function-call-argument  = expression / primary
 primary = immediate / ident
 
 immediate = immediate-real
-immediate-real = [ immediate-sign ] immediate-real-integer-part [ immediate-real-fractional-part ] [ immeidate-real-exponent-part ] 
+immediate-real = [ immediate-sign ] immediate-real-integer-part [ immediate-real-fractional-part ] [ immeidate-real-exponent-part ]
 immediate-real =/ immediate-special-inf
 immediate-real =/ immediate-special-nan
 immediate-real-integer-part    =  non-zero-digit *digit
